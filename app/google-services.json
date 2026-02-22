@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "653313929240",
+    "project_id": "calco-ea900",
+    "storage_bucket": "calco-ea900.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:653313929240:android:4ea471ef48d24cce97d36d",
+        "android_client_info": {
+          "package_name": "com.eq6.calco"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDspkx5FdlcipMOHgODMQXv00QE0zBI_2E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
