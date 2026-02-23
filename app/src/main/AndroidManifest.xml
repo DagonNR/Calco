@@ -11,15 +11,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Calco">
+        <activity android:name=".RouterActivity" />
+
+        <activity android:name=".AdminDashboardActivity" />
+        <activity android:name=".SellerDashboardActivity" />
+        <activity android:name=".ClientDashboardActivity" />
+
+        <activity android:name=".LoginActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".CreateUserActivity" />
+        <activity android:name=".UsersActivity" />
+        <activity android:name=".UserDetailActivity" />
+        <activity android:name=".MainActivity" />
+
     </application>
 
 </manifest>

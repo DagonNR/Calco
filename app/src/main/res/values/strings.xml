@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Calco</string>
+    <string-array name="roles_array">
+        <item>Admin</item>
+        <item>Vendedor</item>
+        <item>Cliente</item>
+    </string-array>
+    <string-array name="user_type_filter_array">
+        <item>Todos</item>
+        <item>Admin</item>
+        <item>Vendedor</item>
+        <item>Cliente</item>
+    </string-array>
 </resources>
