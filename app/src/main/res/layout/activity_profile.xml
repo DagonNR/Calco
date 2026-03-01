@@ -170,7 +170,6 @@
         android:layout_width="0dp"
         android:layout_height="80dp"
         android:background="#F3F5F6"
-        app:menu="@menu/menu_seller_bottom"
         app:itemIconTint="@color/bottom_nav_colors"
         app:itemTextColor="#49454F"
         app:itemActiveIndicatorStyle="@style/BottomNavActiveIndicator"
