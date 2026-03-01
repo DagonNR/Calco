@@ -1,8 +1,10 @@
 package com.eq6.calco
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -52,6 +54,25 @@ class RegisterSaleActivity : AppCompatActivity() {
         loadClients()
 
         btnSave.setOnClickListener { saveSale() }
+
+        val bottom = findViewById<BottomNavigationView>(R.id.bottomNavSeller)
+        bottom.selectedItemId = R.id.nav_history
+        bottom.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_history -> {
+                    startActivity(Intent(this, SellerHistoryActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_home -> true
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    finish()
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     private fun formatSaleNumber(n: Long): String {

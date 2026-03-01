@@ -85,7 +85,8 @@ class SaleDetailActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_profile -> {
-                    // Perfil
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    finish()
                     true
                 }
                 else -> false

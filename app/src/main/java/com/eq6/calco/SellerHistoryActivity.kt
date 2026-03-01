@@ -79,7 +79,8 @@ class SellerHistoryActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_profile -> {
-                    // Perfil de vendedor
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    finish()
                     true
                 }
                 else -> false
