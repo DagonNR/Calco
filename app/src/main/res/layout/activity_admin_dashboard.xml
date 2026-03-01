@@ -20,14 +20,14 @@
         android:id="@+id/tvAppName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Calco"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:textColor="@color/textDark"
         android:layout_marginTop="16dp"
-        android:layout_marginStart="18dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        android:text="Calco"
+        android:textColor="@color/cardWhite"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/ivProfile"
