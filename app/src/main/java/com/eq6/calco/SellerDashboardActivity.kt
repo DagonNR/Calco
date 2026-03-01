@@ -30,6 +30,8 @@ class SellerDashboardActivity : AppCompatActivity() {
         bottom.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_history -> {
+                    startActivity(Intent(this, SellerHistoryActivity::class.java))
+                    finish()
                     true
                 }
                 R.id.nav_home -> true

@@ -54,6 +54,9 @@ class RegisterSaleActivity : AppCompatActivity() {
         btnSave.setOnClickListener { saveSale() }
     }
 
+    private fun formatSaleNumber(n: Long): String {
+        return "A" + n.toString().padStart(4, '0')
+    }
     private fun loadClients() {
         btnSave.isEnabled = false
 
@@ -128,12 +131,13 @@ class RegisterSaleActivity : AppCompatActivity() {
 
         val sellerId = user.uid
         val saleDate = Timestamp(selectedCal.time)
-
+        val d = selectedCal.time
+        val cal = Calendar.getInstance().apply { time = d }
         val monthKey = String.format(
             Locale.getDefault(),
             "%04d-%02d",
-            selectedCal.get(Calendar.YEAR),
-            selectedCal.get(Calendar.MONTH) + 1
+            cal.get(Calendar.YEAR),
+            cal.get(Calendar.MONTH) + 1
         )
 
         db.collection("users").document(sellerId).get()
@@ -143,7 +147,7 @@ class RegisterSaleActivity : AppCompatActivity() {
 
                 val commissionAmount = amount * rate
 
-                val saleData = hashMapOf(
+                val saleData: MutableMap<String, Any> = mutableMapOf(
                     "sellerId" to sellerId,
                     "sellerName" to sellerName,
                     "clientId" to client.uid,
@@ -157,16 +161,31 @@ class RegisterSaleActivity : AppCompatActivity() {
                     "createdAt" to Timestamp.now()
                 )
 
-                db.collection("sales").add(saleData)
-                    .addOnSuccessListener {
-                        setLoading(false)
-                        Toast.makeText(this, "Venta registrada", Toast.LENGTH_LONG).show()
-                        finish()
-                    }
-                    .addOnFailureListener { e ->
-                        setLoading(false)
-                        Toast.makeText(this, "Error guardando venta: ${e.message}", Toast.LENGTH_LONG).show()
-                    }
+                val counterRef = db.collection("counters").document("sales")
+
+                db.runTransaction { tx ->
+                    val snap = tx.get(counterRef)
+                    val last = (snap.getLong("lastNumber") ?: 0L)
+                    val next = last + 1L
+
+                    tx.update(counterRef, "lastNumber", next)
+
+                    val saleNumber = formatSaleNumber(next)
+
+                    saleData["saleNumber"] = saleNumber
+
+                    val saleRef = db.collection("sales").document()
+                    tx.set(saleRef, saleData)
+
+                    saleNumber
+                }.addOnSuccessListener { saleNumber ->
+                    setLoading(false)
+                    Toast.makeText(this, "Venta registrada: #$saleNumber", Toast.LENGTH_LONG).show()
+                    finish()
+                }.addOnFailureListener { e ->
+                    setLoading(false)
+                    Toast.makeText(this, "Error guardando venta: ${e.message}", Toast.LENGTH_LONG).show()
+                }
             }
             .addOnFailureListener { e ->
                 setLoading(false)

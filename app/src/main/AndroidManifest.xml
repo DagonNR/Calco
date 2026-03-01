@@ -30,6 +30,8 @@
         <activity android:name=".UserDetailActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".RegisterSaleActivity" />
+        <activity android:name=".SellerHistoryActivity" />
+        <activity android:name=".SaleDetailActivity" />
 
     </application>
 
