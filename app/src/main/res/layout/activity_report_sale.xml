@@ -10,7 +10,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/splash_bg"
+        android:src="@drawable/splash_bg_2"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -126,13 +126,15 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavSeller"
         android:layout_width="0dp"
-        android:layout_height="62dp"
-        android:background="@android:color/white"
+        android:layout_height="80dp"
+        android:background="#F3F5F6"
         app:menu="@menu/menu_seller_bottom"
-        app:itemIconTint="@color/primary"
-        app:itemTextColor="@color/textDark"
+        app:itemIconTint="@color/bottom_nav_colors"
+        app:itemTextColor="#49454F"
+        app:itemActiveIndicatorStyle="@style/BottomNavActiveIndicator"
+        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
