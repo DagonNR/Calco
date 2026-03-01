@@ -22,6 +22,7 @@ class SaleDetailActivity : AppCompatActivity() {
     private val dateFmt = SimpleDateFormat("dd/MM/yy", Locale.getDefault()).apply {
         timeZone = TimeZone.getDefault()
     }
+    private var saleNumber: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +53,7 @@ class SaleDetailActivity : AppCompatActivity() {
                 val amount = doc.getDouble("amount") ?: 0.0
                 val date = doc.getTimestamp("date")?.toDate()
                 val note = doc.getString("note") ?: ""
+                saleNumber = doc.getString("saleNumber") ?: ""
 
                 etClient.setText(clientName)
                 etAmount.setText(moneyFmt.format(amount))
@@ -63,8 +65,10 @@ class SaleDetailActivity : AppCompatActivity() {
             }
 
         findViewById<MaterialButton>(R.id.btnReport).setOnClickListener {
-            // Conexión a Reportes de ventas
-            Toast.makeText(this, "Pendiente: pantalla Reportar", Toast.LENGTH_SHORT).show()
+            val i = Intent(this, ReportSaleActivity::class.java)
+            i.putExtra("saleId", saleId)
+            i.putExtra("saleNumber", saleNumber)
+            startActivity(i)
         }
 
         val bottom = findViewById<BottomNavigationView>(R.id.bottomNavSeller)
