@@ -2,6 +2,7 @@ package com.eq6.calco
 
 import android.os.Bundle
 import android.util.Patterns
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.FirebaseApp
@@ -21,6 +22,8 @@ class CreateUserActivity : AppCompatActivity() {
     private lateinit var spRole: Spinner
     private lateinit var btnSave: Button
     private lateinit var btnBack: ImageButton
+    private lateinit var tvCommissionLabel: TextView
+    private lateinit var etCommissionPercent: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +32,8 @@ class CreateUserActivity : AppCompatActivity() {
         etName = findViewById(R.id.etName)
         etEmail = findViewById(R.id.etEmail)
         spRole = findViewById(R.id.spRole)
+        tvCommissionLabel = findViewById(R.id.tvCommissionLabel)
+        etCommissionPercent = findViewById(R.id.etCommissionPercent)
         btnSave = findViewById(R.id.btnSave)
         btnBack = findViewById(R.id.btnBack)
 
@@ -39,6 +44,20 @@ class CreateUserActivity : AppCompatActivity() {
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spRole.adapter = adapter
+
+        spRole.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val roleUi = spRole.selectedItem.toString().lowercase()
+                val isSeller = roleUi == "vendedor"
+                tvCommissionLabel.visibility = if (isSeller) View.VISIBLE else View.GONE
+                etCommissionPercent.visibility = if (isSeller) View.VISIBLE else View.GONE
+
+                if (!isSeller) {
+                    etCommissionPercent.setText("")
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
 
         btnBack.setOnClickListener { finish() }
         btnSave.setOnClickListener { createUserFlow() }
@@ -65,6 +84,20 @@ class CreateUserActivity : AppCompatActivity() {
             else -> "client"
         }
 
+        val isSeller = role == "seller"
+        val commissionRate: Double? = if (isSeller) {
+            val percentText = etCommissionPercent.text.toString().trim()
+            val percent = percentText.toDoubleOrNull()
+
+            if (percent == null || percent <= 0 || percent > 100) {
+                etCommissionPercent.error = "Ingresa un % válido (1 a 100)"
+                setLoading(false)
+                return
+            }
+
+            percent / 100.0
+        } else null
+
         setLoading(true)
 
         val secondaryAuth = getSecondaryAuth()
@@ -79,13 +112,17 @@ class CreateUserActivity : AppCompatActivity() {
                     return@addOnSuccessListener
                 }
 
-                val data = hashMapOf(
+                val data: MutableMap<String, Any> = mutableMapOf(
                     "name" to name,
                     "email" to email,
                     "role" to role,
                     "createdAt" to Timestamp.now(),
                     "createdBy" to (mainAuth.currentUser?.uid ?: "unknown")
                 )
+
+                if (commissionRate != null) {
+                    data["commissionRate"] = commissionRate
+                }
 
                 db.collection("users").document(uid).set(data)
                     .addOnSuccessListener {

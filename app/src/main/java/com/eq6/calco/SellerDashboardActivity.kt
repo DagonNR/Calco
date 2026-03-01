@@ -41,6 +41,7 @@ class SellerDashboardActivity : AppCompatActivity() {
         }
 
         findViewById<FloatingActionButton>(R.id.fabSeller).setOnClickListener {
+            startActivity(Intent(this, RegisterSaleActivity::class.java))
         }
 
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btnRegister).setOnClickListener {
