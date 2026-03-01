@@ -17,7 +17,6 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardCreateUser"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="18dp"
@@ -42,7 +41,8 @@
                 android:id="@+id/btnBack"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:background="@drawable/back"
+                android:background="@android:color/transparent"
+                android:src="@drawable/back"
                 android:contentDescription="Volver"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"/>
@@ -51,135 +51,90 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Crear usuario"
-                android:textStyle="bold"
-                android:textSize="22sp"
-                android:textColor="@color/textDark"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toEndOf="@id/btnBack"
                 android:layout_marginStart="8dp"
-                app:layout_constraintBottom_toBottomOf="@id/btnBack"/>
+                android:text="Reporte compra"
+                android:textColor="@color/textDark"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/btnBack"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/tvNameLabel"
+                android:id="@+id/tvReasonLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nombre"
+                android:text="Motivo"
                 android:textColor="@color/textDark"
                 android:layout_marginTop="20dp"
                 app:layout_constraintTop_toBottomOf="@id/tvTitle"
                 app:layout_constraintStart_toStartOf="parent"/>
 
-            <EditText
-                android:id="@+id/etName"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:background="@drawable/bg_input_rounded"
-                android:hint="Nombre"
-                android:inputType="textPersonName"
-                android:textColor="@color/textDark"
-                android:textColorHint="#6B7280"
-                app:layout_constraintTop_toBottomOf="@id/tvNameLabel"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-            <TextView
-                android:id="@+id/tvEmailLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Email"
-                android:textColor="@color/textDark"
-                android:layout_marginTop="14dp"
-                app:layout_constraintTop_toBottomOf="@id/etName"
-                app:layout_constraintStart_toStartOf="parent"/>
-
-            <EditText
-                android:id="@+id/etEmail"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:background="@drawable/bg_input_rounded"
-                android:hint="example@example.com"
-                android:inputType="textEmailAddress"
-                android:textColor="@color/textDark"
-                android:textColorHint="#6B7280"
-                app:layout_constraintTop_toBottomOf="@id/tvEmailLabel"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-            <TextView
-                android:id="@+id/tvRoleLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Rol"
-                android:textColor="@color/textDark"
-                android:layout_marginTop="14dp"
-                app:layout_constraintTop_toBottomOf="@id/etEmail"
-                app:layout_constraintStart_toStartOf="parent"/>
-
             <Spinner
-                android:id="@+id/spRole"
+                android:id="@+id/spReason"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:background="@drawable/bg_input_rounded"
-                app:layout_constraintTop_toBottomOf="@id/tvRoleLabel"
+                app:layout_constraintTop_toBottomOf="@id/tvReasonLabel"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
-                android:id="@+id/tvCommissionLabel"
+                android:id="@+id/tvDescLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="% Comisión"
+                android:text="Descripción"
                 android:textColor="@color/textDark"
                 android:layout_marginTop="14dp"
-                android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/spRole"
+                app:layout_constraintTop_toBottomOf="@id/spReason"
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <EditText
-                android:id="@+id/etCommissionPercent"
+                android:id="@+id/etDescription"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="130dp"
                 android:background="@drawable/bg_input_rounded"
-                android:hint="Ej: 3"
-                android:inputType="numberDecimal"
+                android:hint="Opcional"
+                android:gravity="top"
+                android:inputType="textMultiLine"
                 android:textColor="@color/textDark"
                 android:textColorHint="#6B7280"
-                android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/tvCommissionLabel"
+                app:layout_constraintTop_toBottomOf="@id/tvDescLabel"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSave"
+                android:id="@+id/btnSend"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:text="Guardar"
+                android:text="Enviar"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 app:cornerRadius="12dp"
+                android:layout_marginTop="18dp"
                 android:background="@drawable/bg_button_purple_gradient"
                 app:backgroundTint="@null"
-                android:layout_marginTop="18dp"
-                app:layout_constraintTop_toBottomOf="@id/etCommissionPercent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-            <TextView
-                android:id="@+id/tvHint"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Se enviará un correo para que el usuario cree su contraseña."
-                android:textSize="12sp"
-                android:textColor="#374151"
-                android:gravity="center"
-                android:layout_marginTop="10dp"
-                app:layout_constraintTop_toBottomOf="@id/btnSave"
+                app:layout_constraintTop_toBottomOf="@id/etDescription"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavSeller"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:background="#F3F5F6"
+        app:menu="@menu/menu_seller_bottom"
+        app:itemIconTint="@color/bottom_nav_colors"
+        app:itemTextColor="#49454F"
+        app:itemActiveIndicatorStyle="@style/BottomNavActiveIndicator"
+        app:labelVisibilityMode="labeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
