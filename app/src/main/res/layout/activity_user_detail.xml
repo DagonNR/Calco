@@ -34,14 +34,14 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="18dp">
+            android:padding="18dp"
+            android:background="#F3F5F6">
 
             <ImageButton
                 android:id="@+id/btnBack"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:background="@android:color/transparent"
-                android:src="@android:drawable/ic_media_previous"
+                android:background="@drawable/back"
                 android:contentDescription="Volver"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"/>
@@ -50,14 +50,15 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Detalle usuario"
-                android:textStyle="bold"
-                android:textSize="22sp"
-                android:textColor="@color/textDark"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toEndOf="@id/btnBack"
                 android:layout_marginStart="8dp"
-                app:layout_constraintBottom_toBottomOf="@id/btnBack"/>
+                android:text="Detalle usuario"
+                android:textColor="@color/textDark"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/btnBack"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tvNameLabel"
@@ -73,7 +74,7 @@
                 android:id="@+id/etName"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:background="@drawable/bg_input_rounded"
+                android:background="@drawable/bg_input_rounded_disabled"
                 android:enabled="false"
                 android:hint="Nombre"
                 app:layout_constraintTop_toBottomOf="@id/tvNameLabel"
@@ -94,7 +95,7 @@
                 android:id="@+id/etEmail"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:background="@drawable/bg_input_rounded"
+                android:background="@drawable/bg_input_rounded_disabled"
                 android:enabled="false"
                 android:hint="example@example.com"
                 app:layout_constraintTop_toBottomOf="@id/tvEmailLabel"
@@ -115,7 +116,7 @@
                 android:id="@+id/etRole"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:background="@drawable/bg_input_rounded"
+                android:background="@drawable/bg_input_rounded_disabled"
                 android:enabled="false"
                 android:hint="Admin"
                 app:layout_constraintTop_toBottomOf="@id/tvRoleLabel"
