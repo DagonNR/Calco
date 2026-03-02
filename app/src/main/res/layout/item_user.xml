@@ -4,16 +4,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="10dp"
-    android:paddingHorizontal="6dp">
+    android:padding="10dp"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/bg_history_item">
 
     <ImageButton
         android:id="@+id/btnGo"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:background="@drawable/bg_button_primary"
-        android:src="@android:drawable/ic_media_next"
-        android:tint="@android:color/white"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/item_button"
         android:contentDescription="Ver"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

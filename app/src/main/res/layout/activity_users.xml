@@ -10,7 +10,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/splash_bg"
+        android:src="@drawable/splash_bg_2"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,20 +20,20 @@
         android:id="@+id/tvAppName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:text="Calco"
-        android:textStyle="bold"
+        android:textColor="@color/cardWhite"
         android:textSize="18sp"
-        android:textColor="@color/textDark"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="18dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/ivProfile"
         android:layout_width="28dp"
         android:layout_height="28dp"
-        android:src="@android:drawable/ic_menu_myplaces"
+        android:src="@drawable/user"
         android:contentDescription="Perfil"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="18dp"
@@ -59,7 +59,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="18dp">
+            android:padding="18dp"
+            android:background="#F3F5F6">
 
             <TextView
                 android:id="@+id/tvTitle"
@@ -77,7 +78,7 @@
                 android:id="@+id/ivFilter"
                 android:layout_width="26dp"
                 android:layout_height="26dp"
-                android:src="@android:drawable/ic_menu_sort_by_size"
+                android:src="@drawable/filter_black"
                 android:contentDescription="Filtro"
                 app:layout_constraintTop_toTopOf="@id/tvTitle"
                 app:layout_constraintBottom_toBottomOf="@id/tvTitle"
@@ -117,7 +118,8 @@
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
                     app:cornerRadius="12dp"
-                    app:backgroundTint="@color/primary"
+                    android:background="@drawable/bg_button_purple_gradient"
+                    app:backgroundTint="@null"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="10dp"/>
             </LinearLayout>
@@ -154,26 +156,30 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavAdmin"
         android:layout_width="0dp"
-        android:layout_height="62dp"
-        android:background="@android:color/white"
+        android:layout_height="80dp"
+        android:background="#F3F5F6"
         app:menu="@menu/menu_admin_bottom"
-        app:itemIconTint="@color/primary"
-        app:itemTextColor="@color/textDark"
+        app:itemIconTint="@color/bottom_nav_colors"
+        app:itemTextColor="#49454F"
+        app:itemActiveIndicatorStyle="@style/BottomNavActiveIndicator"
+        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <ImageButton
         android:id="@+id/fabAdmin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="Crear usuario"
-        app:srcCompat="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/primary"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/bg_fab_purple"
+        android:src="@android:drawable/ic_input_add"
         app:tint="@android:color/white"
+        android:scaleType="center"
+        android:contentDescription="Crear usuario"
+        android:elevation="20dp"
         app:layout_constraintBottom_toTopOf="@id/bottomNavAdmin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="12dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

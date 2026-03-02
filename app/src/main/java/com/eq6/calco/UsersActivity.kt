@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.eq6.calco.adapters.UsersAdapter
@@ -81,7 +80,7 @@ class UsersActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<FloatingActionButton>(R.id.fabAdmin).setOnClickListener {
+        findViewById<ImageButton>(R.id.fabAdmin).setOnClickListener {
             startActivity(Intent(this, CreateUserActivity::class.java))
         }
 
