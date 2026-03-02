@@ -2,12 +2,12 @@ package com.eq6.calco
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class AdminDashboardActivity : AppCompatActivity() {
 
@@ -43,7 +43,7 @@ class AdminDashboardActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<FloatingActionButton>(R.id.fabAdmin)
+        findViewById<ImageButton>(R.id.fabAdmin)
             .setOnClickListener {
                 startActivity(Intent(this, CreateUserActivity::class.java))
             }
