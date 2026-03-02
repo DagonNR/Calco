@@ -29,6 +29,11 @@
         <activity android:name=".UsersActivity" />
         <activity android:name=".UserDetailActivity" />
         <activity android:name=".MainActivity" />
+        <activity android:name=".RegisterSaleActivity" />
+        <activity android:name=".SellerHistoryActivity" />
+        <activity android:name=".SaleDetailActivity" />
+        <activity android:name=".ReportSaleActivity" />
+        <activity android:name=".ProfileActivity" />
 
     </application>
 

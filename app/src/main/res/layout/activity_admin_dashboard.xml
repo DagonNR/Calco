@@ -10,7 +10,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/splash_bg"
+        android:src="@drawable/splash_bg_2"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,204 +20,220 @@
         android:id="@+id/tvAppName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
         android:text="Calco"
+        android:textColor="@android:color/white"
+        android:textSize="32dp"
         android:textStyle="bold"
-        android:textSize="18sp"
-        android:textColor="@color/textDark"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="18dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/ivProfile"
         android:layout_width="28dp"
         android:layout_height="28dp"
-        android:src="@android:drawable/ic_menu_myplaces"
+        android:src="@drawable/user"
         android:contentDescription="Perfil"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="14dp"
         android:layout_marginEnd="18dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardHello"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/tvTotalLabel"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Total Ventas"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAppName" />
+
+    <TextView
+        android:id="@+id/tvTotalAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="$0.00"
+        android:textColor="@android:color/white"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTotalLabel" />
+
+    <TextView
+        android:id="@+id/tvMonth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Mes"
+        android:textColor="#E5E7EB"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTotalAmount" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginTop="14dp"
-        android:layout_marginStart="18dp"
-        android:layout_marginEnd="18dp"
-        app:cardCornerRadius="18dp"
-        app:cardElevation="10dp"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintTop_toBottomOf="@id/tvAppName"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="0dp"
+        app:layout_constraintTop_toBottomOf="@id/tvMonth"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavAdmin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <TextView
-            android:id="@+id/tvHello"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="14dp"
-            android:text="Hola,\nNombre\n(Admin)"
-            android:textColor="@color/textDark"
-            android:textSize="14sp"
-            android:gravity="center"/>
+            android:layout_height="match_parent"
+            android:padding="18dp"
+            android:background="#E7E7E7">
 
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardTotal"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginStart="18dp"
-        android:layout_marginEnd="18dp"
-        app:cardCornerRadius="18dp"
-        app:cardElevation="10dp"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintTop_toBottomOf="@id/cardHello"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="18dp">
-
-            <TextView
-                android:id="@+id/tvTotalTitle"
-                android:layout_width="wrap_content"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardHello"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Total Ventas de Febrero 2026"
-                android:textColor="@color/textDark"
-                android:textStyle="bold"
-                android:textSize="16sp"/>
+                app:cardCornerRadius="18dp"
+                app:cardElevation="10dp"
+                app:cardUseCompatPadding="true"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
-            <TextView
-                android:id="@+id/tvTotalAmount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="$142,000.25"
-                android:textColor="@color/textDark"
-                android:textStyle="bold"
-                android:textSize="32sp"
-                android:layout_marginTop="8dp"/>
+                <TextView
+                    android:id="@+id/tvHello"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Hola, Nombre\n(Admin)"
+                    android:textColor="@color/textDark"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:gravity="center"
+                    android:padding="14dp"/>
+            </com.google.android.material.card.MaterialCardView>
 
-        </LinearLayout>
 
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardCompare"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginStart="18dp"
-        android:layout_marginEnd="18dp"
-        app:cardCornerRadius="18dp"
-        app:cardElevation="10dp"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintTop_toBottomOf="@id/cardTotal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
+         <LinearLayout
+            android:id="@+id/cardCompare"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center"
-            android:padding="16dp">
+            android:padding="18dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/cardHello"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-            <TextView
-                android:id="@+id/tvCompareTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Febrero 2026 vs Enero 2026"
-                android:textColor="@color/textDark"
-                android:textStyle="bold"
-                android:textSize="14sp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
+             <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="(Gráfica aquí)"
                 android:textColor="@color/textDark"
                 android:textSize="12sp"
-                android:layout_marginTop="8dp"/>
+                android:gravity="center"/>
+
+             <com.google.android.material.card.MaterialCardView
+                 android:layout_width="224dp"
+                 android:layout_height="60dp"
+                 android:layout_gravity="right"
+                 app:cardBackgroundColor="#F0B2B2"
+                 app:cardCornerRadius="12dp"
+                 app:cardUseCompatPadding="true"
+                 app:layout_constraintEnd_toEndOf="parent"
+                 app:layout_constraintStart_toStartOf="parent"
+                 app:layout_constraintTop_toTopOf="parent">
+
+                 <TextView
+                     android:id="@+id/tvCompareDiff"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_gravity="left"
+                     android:layout_marginLeft="8dp"
+                     android:layout_marginTop="2dp"
+                     android:layout_marginRight="5dp"
+                     android:text="-$1,122,999.78"
+                     android:textColor="#D11A2A"
+                     android:textSize="22sp"
+                     android:textStyle="bold" />
+
+                 <ImageView
+                     android:layout_width="40dp"
+                     android:layout_height="40dp"
+                     android:layout_gravity="right"
+                     android:layout_marginTop="4dp"
+                     android:src="@drawable/arrow_down" />
+
+                 <TextView
+                     android:id="@+id/tvComparePct"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_gravity="left"
+                     android:layout_marginTop="30dp"
+                     android:layout_marginLeft="8dp"
+                     android:text="-88.8%"
+                     android:textColor="#D11A2A"
+                     android:textSize="10sp" />
+             </com.google.android.material.card.MaterialCardView>
+
+         </LinearLayout>
 
             <TextView
-                android:id="@+id/tvCompareDiff"
+                android:id="@+id/cardMonths"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="-$1,122,999.78"
-                android:textColor="#D11A2A"
+                android:text="Meses recientes"
+                android:textColor="@color/textDark"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/cardCompare"
+                app:layout_constraintStart_toStartOf="parent"/>
 
-            <TextView
-                android:id="@+id/tvComparePct"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="-88.8%"
-                android:textColor="#D11A2A"
-                android:textSize="12sp"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvLastMonths"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintTop_toBottomOf="@id/cardMonths"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
-        </LinearLayout>
-
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardMonths"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginStart="18dp"
-        android:layout_marginEnd="18dp"
-        app:cardCornerRadius="18dp"
-        app:cardElevation="10dp"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintTop_toBottomOf="@id/cardCompare"
+    <ImageButton
+        android:id="@+id/fabAdmin"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/bg_fab_purple"
+        android:src="@android:drawable/ic_input_add"
+        app:tint="@android:color/white"
+        android:scaleType="center"
+        android:contentDescription="Acción"
+        android:elevation="10dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavAdmin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:text="(Aquí va la lista de meses como en tu mockup)"
-            android:textColor="@color/textDark"
-            android:textSize="13sp"
-            android:gravity="center"/>
-
-    </com.google.android.material.card.MaterialCardView>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="12dp" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavAdmin"
         android:layout_width="0dp"
-        android:layout_height="62dp"
-        android:background="@android:color/white"
-        app:itemIconTint="@color/primary"
-        app:itemTextColor="@color/textDark"
+        android:layout_height="80dp"
+        android:background="#F3F5F6"
         app:menu="@menu/menu_admin_bottom"
+        app:itemIconTint="@color/bottom_nav_colors"
+        app:itemTextColor="#49454F"
+        app:itemActiveIndicatorStyle="@style/BottomNavActiveIndicator"
+        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAdmin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="Acción"
-        app:srcCompat="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/primary"
-        app:tint="@android:color/white"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavAdmin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="10dp"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
