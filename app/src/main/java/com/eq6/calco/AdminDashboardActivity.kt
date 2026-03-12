@@ -39,6 +39,11 @@ class AdminDashboardActivity : AppCompatActivity() {
                 R.id.nav_report -> {
                     true
                 }
+                R.id.nav_products -> {
+                    startActivity(Intent(this, ProductsActivity::class.java))
+                    finish()
+                    true
+                }
                 else -> false
             }
         }

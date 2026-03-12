@@ -51,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Detalle usuario"
+                android:text="Movimiento"
                 android:textColor="@color/textDark"
                 android:textSize="22sp"
                 android:textStyle="bold"
@@ -61,79 +61,128 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/tvNameLabel"
+                android:id="@+id/tvQuantityLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nombre"
+                android:text="Cantidad"
                 android:textColor="@color/textDark"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="18dp"
                 app:layout_constraintTop_toBottomOf="@id/tvTitle"
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <EditText
-                android:id="@+id/etName"
+                android:id="@+id/etQuantity"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:background="@drawable/bg_input_rounded_disabled"
-                android:enabled="false"
-                android:hint="Nombre"
-                app:layout_constraintTop_toBottomOf="@id/tvNameLabel"
+                android:background="@drawable/bg_input_rounded"
+                android:hint="Ej: 15"
+                android:inputType="number"
+                app:layout_constraintTop_toBottomOf="@id/tvQuantityLabel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <!-- unitCost solo para ENTRADA -->
+            <TextView
+                android:id="@+id/tvUnitCostLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Costo unitario (solo entrada)"
+                android:textColor="@color/textDark"
+                android:layout_marginTop="14dp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/etQuantity"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <EditText
+                android:id="@+id/etUnitCost"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_input_rounded"
+                android:hint="Ej: 12.50"
+                android:inputType="numberDecimal"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/tvUnitCostLabel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <!-- ADJUST: dirección + motivo -->
+            <TextView
+                android:id="@+id/tvAdjustTypeLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tipo de ajuste"
+                android:textColor="@color/textDark"
+                android:layout_marginTop="14dp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/etUnitCost"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <Spinner
+                android:id="@+id/spAdjustDirection"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_input_rounded"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/tvAdjustTypeLabel"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
-                android:id="@+id/tvEmailLabel"
+                android:id="@+id/tvReasonLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Email"
+                android:text="Motivo (solo ajuste)"
                 android:textColor="@color/textDark"
                 android:layout_marginTop="14dp"
-                app:layout_constraintTop_toBottomOf="@id/etName"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/spAdjustDirection"
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <EditText
-                android:id="@+id/etEmail"
+                android:id="@+id/etReason"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:background="@drawable/bg_input_rounded_disabled"
-                android:enabled="false"
-                android:hint="example@example.com"
-                app:layout_constraintTop_toBottomOf="@id/tvEmailLabel"
+                android:background="@drawable/bg_input_rounded"
+                android:hint="Ej: Merma / Roto / Error"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/tvReasonLabel"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
-                android:id="@+id/tvRoleLabel"
+                android:id="@+id/tvNoteLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rol"
+                android:text="Nota (opcional)"
                 android:textColor="@color/textDark"
                 android:layout_marginTop="14dp"
-                app:layout_constraintTop_toBottomOf="@id/etEmail"
+                app:layout_constraintTop_toBottomOf="@id/etReason"
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <EditText
-                android:id="@+id/etRole"
+                android:id="@+id/etNote"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:background="@drawable/bg_input_rounded_disabled"
-                android:enabled="false"
-                android:hint="Admin"
-                app:layout_constraintTop_toBottomOf="@id/tvRoleLabel"
+                android:layout_height="90dp"
+                android:background="@drawable/bg_input_rounded"
+                android:hint="Opcional"
+                android:gravity="top"
+                android:inputType="textMultiLine"
+                app:layout_constraintTop_toBottomOf="@id/tvNoteLabel"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDelete"
+                android:id="@+id/btnSave"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:text="Eliminar"
+                android:text="Guardar"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 app:cornerRadius="12dp"
-                app:backgroundTint="#D11A2A"
+                android:background="@drawable/bg_button_purple_gradient"
+                app:backgroundTint="@null"
                 android:layout_marginTop="18dp"
-                app:layout_constraintTop_toBottomOf="@id/etRole"
+                app:layout_constraintTop_toBottomOf="@id/etNote"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 

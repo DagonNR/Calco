@@ -35,6 +35,10 @@
         <activity android:name=".ReportSaleActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".CreateStoreActivity" />
+        <activity android:name=".ProductsActivity" />
+        <activity android:name=".CreateProductActivity" />
+        <activity android:name=".ProductDetailActivity" />
+        <activity android:name=".InventoryMovementActivity" />
 
     </application>
 
