@@ -41,28 +41,37 @@ class SaleDetailActivity : AppCompatActivity() {
 
         findViewById<ImageButton>(R.id.btnBack).setOnClickListener { finish() }
 
-        db.collection("sales").document(saleId).get()
-            .addOnSuccessListener { doc ->
-                if (!doc.exists()) {
-                    Toast.makeText(this, "Venta no existe", Toast.LENGTH_LONG).show()
-                    finish()
-                    return@addOnSuccessListener
-                }
+        StoreSession.getStoreId(
+            onOk = { storeId ->
+                db.collection("stores").document(storeId)
+                    .collection("sales").document(saleId).get()
+                    .addOnSuccessListener { doc ->
+                        if (!doc.exists()) {
+                            Toast.makeText(this, "Venta no existe", Toast.LENGTH_LONG).show()
+                            finish()
+                            return@addOnSuccessListener
+                        }
 
-                val clientName = doc.getString("clientName") ?: ""
-                val amount = doc.getDouble("amount") ?: 0.0
-                val date = doc.getTimestamp("date")?.toDate()
-                val note = doc.getString("note") ?: ""
-                saleNumber = doc.getString("saleNumber") ?: ""
+                        val clientName = doc.getString("clientName") ?: ""
+                        val amount = doc.getDouble("amount") ?: 0.0
+                        val date = doc.getTimestamp("date")?.toDate()
+                        val note = doc.getString("note") ?: ""
+                        saleNumber = doc.getString("saleNumber") ?: ""
 
-                etClient.setText(clientName)
-                etAmount.setText(moneyFmt.format(amount))
-                etDate.setText(if (date != null) dateFmt.format(date) else "")
-                etNote.setText(note.ifBlank { "" })
+                        etClient.setText(clientName)
+                        etAmount.setText(moneyFmt.format(amount))
+                        etDate.setText(if (date != null) dateFmt.format(date) else "")
+                        etNote.setText(note.ifBlank { "" })
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+            },
+            onFail = { msg ->
+                Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+                finish()
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
-            }
+        )
 
         findViewById<MaterialButton>(R.id.btnReport).setOnClickListener {
             val i = Intent(this, ReportSaleActivity::class.java)

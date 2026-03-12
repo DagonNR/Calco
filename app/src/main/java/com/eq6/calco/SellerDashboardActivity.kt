@@ -94,48 +94,57 @@ class SellerDashboardActivity : AppCompatActivity() {
         tvMonth.text = monthKeyToLabel(monthKey)
         tvCommissionMonth.text = monthKeyToLabel(monthKey)
 
-        db.collection("users").document(user.uid).get()
-            .addOnSuccessListener { doc ->
-                val name = doc.getString("name") ?: (user.email ?: "Vendedor")
-                val rate = doc.getDouble("commissionRate") ?: 0.03
+        StoreSession.getStoreId(
+            onOk = { storeId ->
+                db.collection("stores").document(storeId)
+                    .collection("users").document(user.uid).get()
+                    .addOnSuccessListener { doc ->
+                        val name = doc.getString("name") ?: (user.email ?: "Vendedor")
+                        val rate = doc.getDouble("commissionRate") ?: 0.03
 
-                tvHello.text = "Hola, $name\n(Vendedor)"
+                        tvHello.text = "Hola, $name\n(Vendedor)"
 
-                db.collection("sales")
-                    .whereEqualTo("sellerId", user.uid)
-                    .whereEqualTo("monthKey", monthKey)
-                    .get()
-                    .addOnSuccessListener { snap ->
-                        val salesDocs = snap.documents
+                        db.collection("sales")
+                            .whereEqualTo("sellerId", user.uid)
+                            .whereEqualTo("monthKey", monthKey)
+                            .get()
+                            .addOnSuccessListener { snap ->
+                                val salesDocs = snap.documents
 
-                        val total = salesDocs.sumOf { it.getDouble("amount") ?: 0.0 }
-                        tvTotalAmount.text = moneyFmt.format(total)
+                                val total = salesDocs.sumOf { it.getDouble("amount") ?: 0.0 }
+                                tvTotalAmount.text = moneyFmt.format(total)
 
-                        val commission = total * rate
-                        tvCommissionAmount.text = moneyFmt.format(commission)
-                        tvCommissionNote.text = "${(rate * 100).toInt()}% de ${moneyFmt.format(total)}"
+                                val commission = total * rate
+                                tvCommissionAmount.text = moneyFmt.format(commission)
+                                tvCommissionNote.text = "${(rate * 100).toInt()}% de ${moneyFmt.format(total)}"
 
-                        val last3 = salesDocs
-                            .sortedByDescending { it.getTimestamp("date")?.toDate()?.time ?: 0L }
-                            .take(4)
-                            .map { d ->
-                                DashboardSaleItem(
-                                    id = d.id,
-                                    saleNumber = d.getString("saleNumber") ?: "",
-                                    monthKey = d.getString("monthKey") ?: monthKey,
-                                    amount = d.getDouble("amount") ?: 0.0
-                                )
+                                val last3 = salesDocs
+                                    .sortedByDescending { it.getTimestamp("date")?.toDate()?.time ?: 0L }
+                                    .take(4)
+                                    .map { d ->
+                                        DashboardSaleItem(
+                                            id = d.id,
+                                            saleNumber = d.getString("saleNumber") ?: "",
+                                            monthKey = d.getString("monthKey") ?: monthKey,
+                                            amount = d.getDouble("amount") ?: 0.0
+                                        )
+                                    }
+
+                                adapter.update(last3)
                             }
-
-                        adapter.update(last3)
+                            .addOnFailureListener { e ->
+                                Toast.makeText(this, "Error ventas: ${e.message}", Toast.LENGTH_LONG).show()
+                            }
                     }
                     .addOnFailureListener { e ->
-                        Toast.makeText(this, "Error ventas: ${e.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Error perfil: ${e.message}", Toast.LENGTH_LONG).show()
                     }
+            },
+            onFail = { msg ->
+                Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+                finish()
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error perfil: ${e.message}", Toast.LENGTH_LONG).show()
-            }
+        )
     }
 
     private fun currentMonthKey(): String {

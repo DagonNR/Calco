@@ -44,48 +44,57 @@ class ProfileActivity : AppCompatActivity() {
             return
         }
 
-        db.collection("users").document(user.uid).get()
-            .addOnSuccessListener { doc ->
-                if (!doc.exists()) {
-                    Toast.makeText(this, "Perfil no encontrado", Toast.LENGTH_LONG).show()
-                    auth.signOut()
-                    startActivity(Intent(this, LoginActivity::class.java))
-                    finish()
-                    return@addOnSuccessListener
+        StoreSession.getStoreId(
+            onOk = { storeId ->
+                db.collection("stores").document(storeId)
+                    .collection("users").document(user.uid).get()
+                    .addOnSuccessListener { doc ->
+                        if (!doc.exists()) {
+                            Toast.makeText(this, "Perfil no encontrado", Toast.LENGTH_LONG).show()
+                            auth.signOut()
+                            startActivity(Intent(this, LoginActivity::class.java))
+                            finish()
+                            return@addOnSuccessListener
+                        }
+
+                        val name = doc.getString("name") ?: ""
+                        val email = doc.getString("email") ?: (user.email ?: "")
+                        val role = (doc.getString("role") ?: "").lowercase().trim()
+
+                        etName.setText(name)
+                        etEmail.setText(email)
+
+                        val roleEs = when (role) {
+                            "admin" -> "Admin"
+                            "seller" -> "Vendedor"
+                            "client" -> "Cliente"
+                            else -> role
+                        }
+                        etRole.setText(roleEs)
+
+                        if (role == "seller") {
+                            tvCommissionLabel.visibility = View.VISIBLE
+                            etCommission.visibility = View.VISIBLE
+
+                            val rate = doc.getDouble("commissionRate") ?: 0.03
+                            val percent = rate * 100.0
+                            etCommission.setText("${String.format("%.0f", percent)}%")
+                        } else {
+                            tvCommissionLabel.visibility = View.GONE
+                            etCommission.visibility = View.GONE
+                        }
+
+                        setupBottomNav(role)
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+            },
+            onFail = { msg ->
+                Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+                finish()
                 }
-
-                val name = doc.getString("name") ?: ""
-                val email = doc.getString("email") ?: (user.email ?: "")
-                val role = (doc.getString("role") ?: "").lowercase().trim()
-
-                etName.setText(name)
-                etEmail.setText(email)
-
-                val roleEs = when (role) {
-                    "admin" -> "Admin"
-                    "seller" -> "Vendedor"
-                    "client" -> "Cliente"
-                    else -> role
-                }
-                etRole.setText(roleEs)
-
-                if (role == "seller") {
-                    tvCommissionLabel.visibility = View.VISIBLE
-                    etCommission.visibility = View.VISIBLE
-
-                    val rate = doc.getDouble("commissionRate") ?: 0.03
-                    val percent = rate * 100.0
-                    etCommission.setText("${String.format("%.0f", percent)}%")
-                } else {
-                    tvCommissionLabel.visibility = View.GONE
-                    etCommission.visibility = View.GONE
-                }
-
-                setupBottomNav(role)
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
-            }
+        )
     }
 
     private fun setupBottomNav(role: String) {

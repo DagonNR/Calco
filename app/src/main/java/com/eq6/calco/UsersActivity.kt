@@ -94,21 +94,41 @@ class UsersActivity : AppCompatActivity() {
     }
 
     private fun loadUsers() {
-        db.collection("users").get()
-            .addOnSuccessListener { snap ->
-                allUsers = snap.documents.map { doc ->
-                    UserItem(
-                        uid = doc.id,
-                        name = doc.getString("name") ?: "",
-                        email = doc.getString("email") ?: "",
-                        role = (doc.getString("role") ?: "").lowercase().trim()
-                    )
-                }.sortedBy { it.name.lowercase() }
+        val admin = FirebaseAuth.getInstance().currentUser ?: run {
+            finish()
+            return
+        }
 
-                applyFilter()
+        db.collection("usersIndex").document(admin.uid).get()
+            .addOnSuccessListener { indexDoc ->
+                val storeId = (indexDoc.getString("storeId") ?: "").trim()
+                if (storeId.isBlank()) {
+                    Toast.makeText(this, "No tienes tienda asignada", Toast.LENGTH_LONG).show()
+                    finish()
+                    return@addOnSuccessListener
+                }
+
+                db.collection("stores").document(storeId)
+                    .collection("users")
+                    .get()
+                    .addOnSuccessListener { snap ->
+                        allUsers = snap.documents.map { doc ->
+                            UserItem(
+                                uid = doc.id,
+                                name = doc.getString("name") ?: "",
+                                email = doc.getString("email") ?: "",
+                                role = (doc.getString("role") ?: "").lowercase().trim()
+                            )
+                        }.sortedBy { it.name.lowercase() }
+
+                        applyFilter()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error cargando usuarios: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
             }
-            .addOnFailureListener {
-                Toast.makeText(this, "Error cargando usuarios: ${it.message}", Toast.LENGTH_LONG).show()
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error leyendo tienda: ${e.message}", Toast.LENGTH_LONG).show()
             }
     }
 
