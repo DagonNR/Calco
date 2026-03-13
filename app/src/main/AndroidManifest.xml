@@ -39,6 +39,7 @@
         <activity android:name=".CreateProductActivity" />
         <activity android:name=".ProductDetailActivity" />
         <activity android:name=".InventoryMovementActivity" />
+        <activity android:name=".RegisterSaleCartActivity" />
 
     </application>
 

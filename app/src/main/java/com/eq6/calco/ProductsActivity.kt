@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.firestore.FirebaseFirestore
 import com.eq6.calco.adapters.ProductsAdapter
 import com.eq6.calco.models.ProductItem
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class ProductsActivity : AppCompatActivity() {
 
@@ -19,7 +20,6 @@ class ProductsActivity : AppCompatActivity() {
     private lateinit var rv: androidx.recyclerview.widget.RecyclerView
     private lateinit var tvEmpty: TextView
     private lateinit var adapter: ProductsAdapter
-    private lateinit var btnBack: ImageButton
     private var allProducts: List<ProductItem> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +30,6 @@ class ProductsActivity : AppCompatActivity() {
         spFilter = findViewById(R.id.spFilter)
         rv = findViewById(R.id.rvProducts)
         tvEmpty = findViewById(R.id.tvEmpty)
-        btnBack = findViewById(R.id.btnBack)
 
         val filterOptions = listOf("Todos", "Activos", "Desactivados")
         spFilter.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, filterOptions).apply {
@@ -59,7 +58,32 @@ class ProductsActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        btnBack.setOnClickListener { finish() }
+        val bottom = findViewById<BottomNavigationView>(R.id.bottomNavAdmin)
+        bottom.selectedItemId = R.id.nav_products
+
+        bottom.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_users -> {
+                    startActivity(Intent(this, UsersActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_home -> {
+                    startActivity(Intent(this, AdminDashboardActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_report -> {
+                    true
+                }
+                R.id.nav_products -> {
+                    startActivity(Intent(this, ProductsActivity::class.java))
+                    finish()
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     override fun onResume() {

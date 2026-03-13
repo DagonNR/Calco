@@ -9,11 +9,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.eq6.calco.adapters.DashboardSalesAdapter
+import com.eq6.calco.models.DashboardSaleItem
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.eq6.calco.adapters.DashboardSalesAdapter
-import com.eq6.calco.models.DashboardSaleItem
 import java.text.NumberFormat
 import java.util.Calendar
 import java.util.Locale
@@ -51,6 +51,7 @@ class SellerDashboardActivity : AppCompatActivity() {
             i.putExtra("saleId", sale.id)
             startActivity(i)
         }
+
         val rv = findViewById<RecyclerView>(R.id.rvLastSales)
         rv.layoutManager = LinearLayoutManager(this)
         rv.adapter = adapter
@@ -59,8 +60,9 @@ class SellerDashboardActivity : AppCompatActivity() {
             startActivity(Intent(this, ProfileActivity::class.java))
         }
 
+        // OJO: si esto en tu XML es FloatingActionButton, cámbialo a FloatingActionButton en vez de ImageButton
         findViewById<ImageButton>(R.id.fabRegister).setOnClickListener {
-            startActivity(Intent(this, RegisterSaleActivity::class.java))
+            startActivity(Intent(this, RegisterSaleCartActivity::class.java))
         }
 
         val bottom = findViewById<BottomNavigationView>(R.id.bottomNavSeller)
@@ -69,6 +71,7 @@ class SellerDashboardActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_history -> {
                     startActivity(Intent(this, SellerHistoryActivity::class.java))
+                    finish()
                     true
                 }
                 R.id.nav_home -> true
@@ -96,15 +99,19 @@ class SellerDashboardActivity : AppCompatActivity() {
 
         StoreSession.getStoreId(
             onOk = { storeId ->
-                db.collection("stores").document(storeId)
-                    .collection("users").document(user.uid).get()
+
+                val storeRef = db.collection("stores").document(storeId)
+
+                // Perfil vendedor (de la tienda)
+                storeRef.collection("users").document(user.uid).get()
                     .addOnSuccessListener { doc ->
                         val name = doc.getString("name") ?: (user.email ?: "Vendedor")
                         val rate = doc.getDouble("commissionRate") ?: 0.03
 
                         tvHello.text = "Hola, $name\n(Vendedor)"
 
-                        db.collection("sales")
+                        // ✅ Ventas del mes (de la tienda)
+                        storeRef.collection("sales")
                             .whereEqualTo("sellerId", user.uid)
                             .whereEqualTo("monthKey", monthKey)
                             .get()
@@ -118,9 +125,10 @@ class SellerDashboardActivity : AppCompatActivity() {
                                 tvCommissionAmount.text = moneyFmt.format(commission)
                                 tvCommissionNote.text = "${(rate * 100).toInt()}% de ${moneyFmt.format(total)}"
 
+                                // últimas 3 ventas (o cambia a 4 si quieres)
                                 val last3 = salesDocs
                                     .sortedByDescending { it.getTimestamp("date")?.toDate()?.time ?: 0L }
-                                    .take(4)
+                                    .take(3)
                                     .map { d ->
                                         DashboardSaleItem(
                                             id = d.id,
@@ -149,7 +157,8 @@ class SellerDashboardActivity : AppCompatActivity() {
 
     private fun currentMonthKey(): String {
         val cal = Calendar.getInstance()
-        return String.format(Locale.getDefault(), "%04d-%02d",
+        return String.format(
+            Locale.getDefault(), "%04d-%02d",
             cal.get(Calendar.YEAR),
             cal.get(Calendar.MONTH) + 1
         )

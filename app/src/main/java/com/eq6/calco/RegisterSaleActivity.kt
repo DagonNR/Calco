@@ -8,13 +8,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.eq6.calco.models.ClientOption
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-
-data class ClientOption(val uid: String, val name: String) {
-    override fun toString(): String = name
-}
 
 class RegisterSaleActivity : AppCompatActivity() {
 
