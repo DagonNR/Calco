@@ -8,13 +8,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.eq6.calco.models.ClientOption
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-
-data class ClientOption(val uid: String, val name: String) {
-    override fun toString(): String = name
-}
 
 class RegisterSaleActivity : AppCompatActivity() {
 
@@ -81,33 +78,41 @@ class RegisterSaleActivity : AppCompatActivity() {
     private fun loadClients() {
         btnSave.isEnabled = false
 
-        db.collection("users")
-            .whereEqualTo("role", "client")
-            .get()
-            .addOnSuccessListener { snap ->
-                clients = snap.documents.map { doc ->
-                    ClientOption(
-                        uid = doc.id,
-                        name = doc.getString("name") ?: "(Sin nombre)"
-                    )
-                }.sortedBy { it.name.lowercase() }
+        StoreSession.getStoreId(
+            onOk = { storeId ->
+                db.collection("stores").document(storeId)
+                    .collection("users")
+                    .whereEqualTo("role", "client")
+                    .get()
+                    .addOnSuccessListener { snap ->
+                        clients = snap.documents.map { doc ->
+                            ClientOption(
+                                uid = doc.id,
+                                name = doc.getString("name") ?: "(Sin nombre)"
+                            )
+                        }.sortedBy { it.name.lowercase() }
 
-                val adapter = ArrayAdapter(
-                    this,
-                    android.R.layout.simple_spinner_item,
-                    clients
-                )
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                spClient.adapter = adapter
+                        val adapter = ArrayAdapter(
+                            this,
+                            android.R.layout.simple_spinner_item,
+                            clients
+                        )
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        spClient.adapter = adapter
 
-                btnSave.isEnabled = clients.isNotEmpty()
-                if (clients.isEmpty()) {
-                    Toast.makeText(this, "No hay clientes registrados", Toast.LENGTH_LONG).show()
-                }
+                        btnSave.isEnabled = clients.isNotEmpty()
+                        if (clients.isEmpty()) {
+                            Toast.makeText(this, "No hay clientes registrados", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error cargando clientes: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+            },
+            onFail = { msg ->
+                Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error cargando clientes: ${e.message}", Toast.LENGTH_LONG).show()
-            }
+        )
     }
 
     private fun openDatePicker() {
@@ -161,57 +166,66 @@ class RegisterSaleActivity : AppCompatActivity() {
             cal.get(Calendar.MONTH) + 1
         )
 
-        db.collection("users").document(sellerId).get()
-            .addOnSuccessListener { sellerDoc ->
-                val sellerName = sellerDoc.getString("name") ?: (user.email ?: "Vendedor")
-                val rate = sellerDoc.getDouble("commissionRate") ?: 0.03
+        StoreSession.getStoreId(
+            onOk = { storeId ->
+                db.collection("stores").document(storeId)
+                    .collection("users").document(sellerId).get()
+                    .addOnSuccessListener { sellerDoc ->
+                        val sellerName = sellerDoc.getString("name") ?: (user.email ?: "Vendedor")
+                        val rate = sellerDoc.getDouble("commissionRate") ?: 0.03
+                        val commissionAmount = amount * rate
 
-                val commissionAmount = amount * rate
+                        val saleData: MutableMap<String, Any> = mutableMapOf(
+                            "sellerId" to sellerId,
+                            "sellerName" to sellerName,
+                            "clientId" to client.uid,
+                            "clientName" to client.name,
+                            "amount" to amount,
+                            "date" to saleDate,
+                            "note" to note,
+                            "monthKey" to monthKey,
+                            "commissionRateUsed" to rate,
+                            "commissionAmount" to commissionAmount,
+                            "createdAt" to Timestamp.now()
+                        )
 
-                val saleData: MutableMap<String, Any> = mutableMapOf(
-                    "sellerId" to sellerId,
-                    "sellerName" to sellerName,
-                    "clientId" to client.uid,
-                    "clientName" to client.name,
-                    "amount" to amount,
-                    "date" to saleDate,
-                    "note" to note,
-                    "monthKey" to monthKey,
-                    "commissionRateUsed" to rate,
-                    "commissionAmount" to commissionAmount,
-                    "createdAt" to Timestamp.now()
-                )
+                        val storeRef = db.collection("stores").document(storeId)
+                        val counterRef = storeRef.collection("counters").document("sales")
+                        val salesCol = storeRef.collection("sales")
 
-                val counterRef = db.collection("counters").document("sales")
+                        db.runTransaction { tx ->
+                            val snap = tx.get(counterRef)
+                            val last = (snap.getLong("lastNumber") ?: 0L)
+                            val next = last + 1L
 
-                db.runTransaction { tx ->
-                    val snap = tx.get(counterRef)
-                    val last = (snap.getLong("lastNumber") ?: 0L)
-                    val next = last + 1L
+                            tx.update(counterRef, "lastNumber", next)
 
-                    tx.update(counterRef, "lastNumber", next)
+                            val saleNumber = "A" + next.toString().padStart(4, '0')
+                            saleData["saleNumber"] = saleNumber
 
-                    val saleNumber = formatSaleNumber(next)
+                            val saleRef = salesCol.document()
+                            tx.set(saleRef, saleData)
 
-                    saleData["saleNumber"] = saleNumber
-
-                    val saleRef = db.collection("sales").document()
-                    tx.set(saleRef, saleData)
-
-                    saleNumber
-                }.addOnSuccessListener { saleNumber ->
-                    setLoading(false)
-                    Toast.makeText(this, "Venta registrada: #$saleNumber", Toast.LENGTH_LONG).show()
-                    finish()
-                }.addOnFailureListener { e ->
-                    setLoading(false)
-                    Toast.makeText(this, "Error guardando venta: ${e.message}", Toast.LENGTH_LONG).show()
-                }
-            }
-            .addOnFailureListener { e ->
+                            saleNumber
+                        }.addOnSuccessListener { saleNumber ->
+                            setLoading(false)
+                            Toast.makeText(this, "Venta registrada: #$saleNumber", Toast.LENGTH_LONG).show()
+                            finish()
+                        }.addOnFailureListener { e ->
+                            setLoading(false)
+                            Toast.makeText(this, "Error guardando venta: ${e.message}", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        setLoading(false)
+                        Toast.makeText(this, "Error leyendo vendedor: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+            },
+            onFail = { msg ->
                 setLoading(false)
-                Toast.makeText(this, "Error leyendo vendedor: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
             }
+        )
     }
 
     private fun setLoading(loading: Boolean) {

@@ -9,11 +9,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.eq6.calco.adapters.DashboardSalesAdapter
+import com.eq6.calco.models.DashboardSaleItem
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.eq6.calco.adapters.DashboardSalesAdapter
-import com.eq6.calco.models.DashboardSaleItem
 import java.text.NumberFormat
 import java.util.Calendar
 import java.util.Locale
@@ -51,6 +51,7 @@ class SellerDashboardActivity : AppCompatActivity() {
             i.putExtra("saleId", sale.id)
             startActivity(i)
         }
+
         val rv = findViewById<RecyclerView>(R.id.rvLastSales)
         rv.layoutManager = LinearLayoutManager(this)
         rv.adapter = adapter
@@ -59,8 +60,9 @@ class SellerDashboardActivity : AppCompatActivity() {
             startActivity(Intent(this, ProfileActivity::class.java))
         }
 
+        // OJO: si esto en tu XML es FloatingActionButton, cámbialo a FloatingActionButton en vez de ImageButton
         findViewById<ImageButton>(R.id.fabRegister).setOnClickListener {
-            startActivity(Intent(this, RegisterSaleActivity::class.java))
+            startActivity(Intent(this, RegisterSaleCartActivity::class.java))
         }
 
         val bottom = findViewById<BottomNavigationView>(R.id.bottomNavSeller)
@@ -69,6 +71,7 @@ class SellerDashboardActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_history -> {
                     startActivity(Intent(this, SellerHistoryActivity::class.java))
+                    finish()
                     true
                 }
                 R.id.nav_home -> true
@@ -94,53 +97,68 @@ class SellerDashboardActivity : AppCompatActivity() {
         tvMonth.text = monthKeyToLabel(monthKey)
         tvCommissionMonth.text = monthKeyToLabel(monthKey)
 
-        db.collection("users").document(user.uid).get()
-            .addOnSuccessListener { doc ->
-                val name = doc.getString("name") ?: (user.email ?: "Vendedor")
-                val rate = doc.getDouble("commissionRate") ?: 0.03
+        StoreSession.getStoreId(
+            onOk = { storeId ->
 
-                tvHello.text = "Hola, $name\n(Vendedor)"
+                val storeRef = db.collection("stores").document(storeId)
 
-                db.collection("sales")
-                    .whereEqualTo("sellerId", user.uid)
-                    .whereEqualTo("monthKey", monthKey)
-                    .get()
-                    .addOnSuccessListener { snap ->
-                        val salesDocs = snap.documents
+                // Perfil vendedor (de la tienda)
+                storeRef.collection("users").document(user.uid).get()
+                    .addOnSuccessListener { doc ->
+                        val name = doc.getString("name") ?: (user.email ?: "Vendedor")
+                        val rate = doc.getDouble("commissionRate") ?: 0.03
 
-                        val total = salesDocs.sumOf { it.getDouble("amount") ?: 0.0 }
-                        tvTotalAmount.text = moneyFmt.format(total)
+                        tvHello.text = "Hola, $name\n(Vendedor)"
 
-                        val commission = total * rate
-                        tvCommissionAmount.text = moneyFmt.format(commission)
-                        tvCommissionNote.text = "${(rate * 100).toInt()}% de ${moneyFmt.format(total)}"
+                        // ✅ Ventas del mes (de la tienda)
+                        storeRef.collection("sales")
+                            .whereEqualTo("sellerId", user.uid)
+                            .whereEqualTo("monthKey", monthKey)
+                            .get()
+                            .addOnSuccessListener { snap ->
+                                val salesDocs = snap.documents
 
-                        val last3 = salesDocs
-                            .sortedByDescending { it.getTimestamp("date")?.toDate()?.time ?: 0L }
-                            .take(4)
-                            .map { d ->
-                                DashboardSaleItem(
-                                    id = d.id,
-                                    saleNumber = d.getString("saleNumber") ?: "",
-                                    monthKey = d.getString("monthKey") ?: monthKey,
-                                    amount = d.getDouble("amount") ?: 0.0
-                                )
+                                val total = salesDocs.sumOf { it.getDouble("amount") ?: 0.0 }
+                                tvTotalAmount.text = moneyFmt.format(total)
+
+                                val commission = total * rate
+                                tvCommissionAmount.text = moneyFmt.format(commission)
+                                tvCommissionNote.text = "${(rate * 100).toInt()}% de ${moneyFmt.format(total)}"
+
+                                // últimas 3 ventas (o cambia a 4 si quieres)
+                                val last3 = salesDocs
+                                    .sortedByDescending { it.getTimestamp("date")?.toDate()?.time ?: 0L }
+                                    .take(3)
+                                    .map { d ->
+                                        DashboardSaleItem(
+                                            id = d.id,
+                                            saleNumber = d.getString("saleNumber") ?: "",
+                                            monthKey = d.getString("monthKey") ?: monthKey,
+                                            amount = d.getDouble("amount") ?: 0.0
+                                        )
+                                    }
+
+                                adapter.update(last3)
                             }
-
-                        adapter.update(last3)
+                            .addOnFailureListener { e ->
+                                Toast.makeText(this, "Error ventas: ${e.message}", Toast.LENGTH_LONG).show()
+                            }
                     }
                     .addOnFailureListener { e ->
-                        Toast.makeText(this, "Error ventas: ${e.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Error perfil: ${e.message}", Toast.LENGTH_LONG).show()
                     }
+            },
+            onFail = { msg ->
+                Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+                finish()
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error perfil: ${e.message}", Toast.LENGTH_LONG).show()
-            }
+        )
     }
 
     private fun currentMonthKey(): String {
         val cal = Calendar.getInstance()
-        return String.format(Locale.getDefault(), "%04d-%02d",
+        return String.format(
+            Locale.getDefault(), "%04d-%02d",
             cal.get(Calendar.YEAR),
             cal.get(Calendar.MONTH) + 1
         )

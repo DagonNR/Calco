@@ -32,29 +32,26 @@ class CreateUserActivity : AppCompatActivity() {
         etName = findViewById(R.id.etName)
         etEmail = findViewById(R.id.etEmail)
         spRole = findViewById(R.id.spRole)
-        tvCommissionLabel = findViewById(R.id.tvCommissionLabel)
-        etCommissionPercent = findViewById(R.id.etCommissionPercent)
         btnSave = findViewById(R.id.btnSave)
         btnBack = findViewById(R.id.btnBack)
 
+        tvCommissionLabel = findViewById(R.id.tvCommissionLabel)
+        etCommissionPercent = findViewById(R.id.etCommissionPercent)
+
         val adapter = ArrayAdapter.createFromResource(
             this,
-            R.array.roles_array,
+            R.array.roles_array, // Admin, Vendedor, Cliente
             android.R.layout.simple_spinner_item
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spRole.adapter = adapter
-
         spRole.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val roleUi = spRole.selectedItem.toString().lowercase()
                 val isSeller = roleUi == "vendedor"
                 tvCommissionLabel.visibility = if (isSeller) View.VISIBLE else View.GONE
                 etCommissionPercent.visibility = if (isSeller) View.VISIBLE else View.GONE
-
-                if (!isSeller) {
-                    etCommissionPercent.setText("")
-                }
+                if (!isSeller) etCommissionPercent.setText("")
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
@@ -64,6 +61,12 @@ class CreateUserActivity : AppCompatActivity() {
     }
 
     private fun createUserFlow() {
+        val admin = mainAuth.currentUser ?: run {
+            Toast.makeText(this, "Sesión no válida", Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+
         val name = etName.text.toString().trim()
         val email = etEmail.text.toString().trim()
         val roleUi = spRole.selectedItem.toString()
@@ -84,74 +87,89 @@ class CreateUserActivity : AppCompatActivity() {
             else -> "client"
         }
 
-        val isSeller = role == "seller"
-        val commissionRate: Double? = if (isSeller) {
+        val commissionRate: Double? = if (role == "seller") {
             val percentText = etCommissionPercent.text.toString().trim()
             val percent = percentText.toDoubleOrNull()
-
             if (percent == null || percent <= 0 || percent > 100) {
                 etCommissionPercent.error = "Ingresa un % válido (1 a 100)"
-                setLoading(false)
                 return
             }
-
             percent / 100.0
         } else null
 
         setLoading(true)
 
-        val secondaryAuth = getSecondaryAuth()
-
-        val tempPassword = generateTempPassword()
-
-        secondaryAuth.createUserWithEmailAndPassword(email, tempPassword)
-            .addOnSuccessListener { result ->
-                val uid = result.user?.uid ?: run {
+        db.collection("usersIndex").document(admin.uid).get()
+            .addOnSuccessListener { adminIndex ->
+                val storeId = (adminIndex.getString("storeId") ?: "").trim()
+                if (storeId.isBlank()) {
                     setLoading(false)
-                    Toast.makeText(this, "No se pudo obtener UID", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "No tienes tienda asignada. Crea una tienda primero.", Toast.LENGTH_LONG).show()
+                    finish()
                     return@addOnSuccessListener
                 }
 
-                val data: MutableMap<String, Any> = mutableMapOf(
-                    "name" to name,
-                    "email" to email,
-                    "role" to role,
-                    "createdAt" to Timestamp.now(),
-                    "createdBy" to (mainAuth.currentUser?.uid ?: "unknown")
-                )
+                val secondaryAuth = getSecondaryAuth()
+                val tempPassword = generateTempPassword()
 
-                if (commissionRate != null) {
-                    data["commissionRate"] = commissionRate
-                }
+                secondaryAuth.createUserWithEmailAndPassword(email, tempPassword)
+                    .addOnSuccessListener { result ->
+                        val newUid = result.user?.uid ?: run {
+                            setLoading(false)
+                            Toast.makeText(this, "No se pudo obtener UID del nuevo usuario", Toast.LENGTH_LONG).show()
+                            return@addOnSuccessListener
+                        }
 
-                db.collection("users").document(uid).set(data)
-                    .addOnSuccessListener {
+                        val indexRef = db.collection("usersIndex").document(newUid)
+                        val storeUserRef = db.collection("stores").document(storeId)
+                            .collection("users").document(newUid)
 
-                        secondaryAuth.sendPasswordResetEmail(email)
-                            .addOnSuccessListener {
-                                secondaryAuth.signOut()
-                                setLoading(false)
-                                Toast.makeText(
-                                    this,
-                                    "Usuario creado. Se envió correo para crear contraseña.",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                                finish()
-                            }
-                            .addOnFailureListener { e ->
-                                setLoading(false)
-                                Toast.makeText(this, "Usuario creado, pero error enviando correo: ${e.message}", Toast.LENGTH_LONG).show()
-                                finish()
-                            }
+                        val indexData: MutableMap<String, Any> = mutableMapOf(
+                            "storeId" to storeId,
+                            "role" to role,
+                            "name" to name,
+                            "email" to email
+                        )
+                        if (commissionRate != null) indexData["commissionRate"] = commissionRate
+
+                        val storeUserData: MutableMap<String, Any> = mutableMapOf(
+                            "name" to name,
+                            "email" to email,
+                            "role" to role,
+                            "createdAt" to Timestamp.now(),
+                            "createdBy" to admin.uid
+                        )
+                        if (commissionRate != null) storeUserData["commissionRate"] = commissionRate
+
+                        db.runBatch { batch ->
+                            batch.set(indexRef, indexData)
+                            batch.set(storeUserRef, storeUserData)
+                        }.addOnSuccessListener {
+
+                            secondaryAuth.sendPasswordResetEmail(email)
+                                .addOnSuccessListener {
+                                    setLoading(false)
+                                    Toast.makeText(this, "Usuario creado. Se envió correo para crear contraseña.", Toast.LENGTH_LONG).show()
+                                    finish()
+                                }
+                                .addOnFailureListener { e ->
+                                    setLoading(false)
+                                    Toast.makeText(this, "Usuario creado, pero error enviando correo: ${e.message}", Toast.LENGTH_LONG).show()
+                                    finish()
+                                }
+                        }.addOnFailureListener { e ->
+                            setLoading(false)
+                            Toast.makeText(this, "Error guardando usuario: ${e.message}", Toast.LENGTH_LONG).show()
+                        }
                     }
                     .addOnFailureListener { e ->
                         setLoading(false)
-                        Toast.makeText(this, "Error guardando perfil: ${e.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Error creando usuario: ${e.message}", Toast.LENGTH_LONG).show()
                     }
             }
             .addOnFailureListener { e ->
                 setLoading(false)
-                Toast.makeText(this, "Error creando usuario: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Error leyendo tienda: ${e.message}", Toast.LENGTH_LONG).show()
             }
     }
 
@@ -171,7 +189,7 @@ class CreateUserActivity : AppCompatActivity() {
 
         val secondaryApp = try {
             FirebaseApp.getInstance("Secondary")
-        } catch (_: IllegalStateException) {
+        } catch (e: IllegalStateException) {
             FirebaseApp.initializeApp(this, options, "Secondary")
         }
 

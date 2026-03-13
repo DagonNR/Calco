@@ -14,7 +14,7 @@ class RouterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
+        setContentView(R.layout.activity_router)
 
         val user = auth.currentUser
         if (user == null) {
@@ -24,17 +24,25 @@ class RouterActivity : AppCompatActivity() {
 
         val uid = user.uid
 
-        db.collection("users").document(uid).get()
+        db.collection("usersIndex").document(uid).get()
             .addOnSuccessListener { doc ->
+                // Si no existe el doc, mandamos a crear tienda
                 if (!doc.exists()) {
-                    Toast.makeText(this, "Usuario sin perfil (users/$uid)", Toast.LENGTH_LONG).show()
-                    auth.signOut()
-                    goToLogin()
+                    startActivity(Intent(this, CreateStoreActivity::class.java))
+                    finish()
                     return@addOnSuccessListener
                 }
 
                 val role = (doc.getString("role") ?: "").lowercase().trim()
+                val storeId = (doc.getString("storeId") ?: "").trim()
                 val name = doc.getString("name") ?: (user.email ?: "Usuario")
+
+                // Si existe el doc pero no hay storeId, también mandamos a crear tienda
+                if (storeId.isBlank()) {
+                    startActivity(Intent(this, CreateStoreActivity::class.java))
+                    finish()
+                    return@addOnSuccessListener
+                }
 
                 when (role) {
                     "admin" -> goToAdmin(name)
@@ -48,7 +56,7 @@ class RouterActivity : AppCompatActivity() {
                 }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error leyendo perfil: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Error leyendo usersIndex: ${e.message}", Toast.LENGTH_LONG).show()
                 auth.signOut()
                 goToLogin()
             }

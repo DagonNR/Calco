@@ -91,33 +91,37 @@ class SellerHistoryActivity : AppCompatActivity() {
     }
 
     private fun loadSales() {
-        val user = auth.currentUser ?: run {
-            finish()
-            return
-        }
+        val user = auth.currentUser ?: run { finish(); return }
 
-        db.collection("sales")
-            .whereEqualTo("sellerId", user.uid)
-            .get()
-            .addOnSuccessListener { snap ->
-                allSales = snap.documents.map { doc ->
-                    SaleItem(
-                        id = doc.id,
-                        saleNumber = doc.getString("saleNumber") ?: "",
-                        amount = doc.getDouble("amount") ?: 0.0,
-                        monthKey = doc.getString("monthKey") ?: "",
-                        date = doc.getTimestamp("date") ?: Timestamp.now(),
-                        clientId = doc.getString("clientId") ?: "",
-                        clientName = doc.getString("clientName") ?: ""
-                    )
-                }.sortedByDescending { it.date?.toDate()?.time ?: 0L }
+        StoreSession.getStoreId(
+            onOk = { storeId ->
+                db.collection("stores").document(storeId)
+                    .collection("sales")
+                    .whereEqualTo("sellerId", user.uid)
+                    .get()
+                    .addOnSuccessListener { snap ->
+                        allSales = snap.documents.map { doc ->
+                            SaleItem(
+                                id = doc.id,
+                                saleNumber = doc.getString("saleNumber") ?: "",
+                                amount = doc.getDouble("amount") ?: 0.0,
+                                date = doc.getTimestamp("date") ?: Timestamp.now(),
+                                clientId = doc.getString("clientId") ?: "",
+                                clientName = doc.getString("clientName") ?: ""
+                            )
+                        }.sortedByDescending { it.date?.toDate()?.time ?: 0L }
 
-                buildFilters()
-                applyFilters()
+                        buildFilters()
+                        applyFilters()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error cargando ventas: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+            },
+            onFail = { msg ->
+                Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error cargando ventas: ${e.message}", Toast.LENGTH_LONG).show()
-            }
+        )
     }
 
     private fun buildFilters() {
