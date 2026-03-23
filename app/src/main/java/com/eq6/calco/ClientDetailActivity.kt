@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-class SaleDetailActivity : AppCompatActivity() {
+class PurchaseDetailActivity : AppCompatActivity() {
 
     private val db by lazy { FirebaseFirestore.getInstance() }
 
@@ -25,19 +25,21 @@ class SaleDetailActivity : AppCompatActivity() {
     private val dateFmt = SimpleDateFormat("dd/MM/yy", Locale.getDefault()).apply {
         timeZone = TimeZone.getDefault()
     }
+
     private var saleNumber: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sale_detail)
+        setContentView(R.layout.activity_client_detail)
 
         val saleId = intent.getStringExtra("saleId") ?: run {
-            Toast.makeText(this, "Falta saleId", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Error: No se encontró el ID de compra", Toast.LENGTH_LONG).show()
             finish()
             return
         }
 
-        val etClient = findViewById<EditText>(R.id.etClient)
+        val etPurchaseId = findViewById<EditText>(R.id.etPurchaseID)
+        val etSeller = findViewById<EditText>(R.id.etSeller)
         val etAmount = findViewById<EditText>(R.id.etAmount)
         val etDate = findViewById<EditText>(R.id.etDate)
         val rvSaleItems = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvSaleItems)
@@ -54,7 +56,7 @@ class SaleDetailActivity : AppCompatActivity() {
                     .collection("sales").document(saleId).get()
                     .addOnSuccessListener { doc ->
                         if (!doc.exists()) {
-                            Toast.makeText(this, "Venta no existe", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this, "La compra no existe", Toast.LENGTH_LONG).show()
                             finish()
                             return@addOnSuccessListener
                         }
@@ -79,12 +81,13 @@ class SaleDetailActivity : AppCompatActivity() {
                                 Toast.makeText(this, "Error productos: ${e.message}", Toast.LENGTH_LONG).show()
                             }
 
-                        val clientName = doc.getString("clientName") ?: ""
+                        val sellerName = doc.getString("sellerName") ?: ""
                         val amount = doc.getDouble("amount") ?: 0.0
                         val date = doc.getTimestamp("date")?.toDate()
                         saleNumber = doc.getString("saleNumber") ?: ""
 
-                        etClient.setText(clientName)
+                        etPurchaseId.setText(saleNumber)
+                        etSeller.setText(sellerName)
                         etAmount.setText(moneyFmt.format(amount))
                         etDate.setText(if (date != null) dateFmt.format(date) else "")
                     }
@@ -105,22 +108,16 @@ class SaleDetailActivity : AppCompatActivity() {
             startActivity(i)
         }
 
-        val bottom = findViewById<BottomNavigationView>(R.id.bottomNavSeller)
-        bottom.selectedItemId = R.id.nav_history
+        val bottom = findViewById<BottomNavigationView>(R.id.bottomNavClient)
+        bottom.selectedItemId = R.id.nav_home
+
         bottom.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_history -> {
-                    finish()
                     true
                 }
-                R.id.nav_home -> {
-                    startActivity(Intent(this, SellerDashboardActivity::class.java))
-                    finish()
-                    true
-                }
+                R.id.nav_home -> true
                 R.id.nav_profile -> {
-                    startActivity(Intent(this, ProfileActivity::class.java))
-                    finish()
                     true
                 }
                 else -> false

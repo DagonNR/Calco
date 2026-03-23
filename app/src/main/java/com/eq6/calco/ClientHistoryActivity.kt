@@ -14,11 +14,11 @@ import com.eq6.calco.adapters.SalesAdapter
 import com.eq6.calco.models.SaleItem
 import java.util.Locale
 
-data class FilterClientOption(val id: String, val name: String) {
+data class FilterSellerOption(val id: String, val name: String) {
     override fun toString(): String = name
 }
 
-class SellerHistoryActivity : AppCompatActivity() {
+class ClientHistoryActivity : AppCompatActivity() {
 
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { FirebaseFirestore.getInstance() }
@@ -26,7 +26,7 @@ class SellerHistoryActivity : AppCompatActivity() {
     private lateinit var ivFilter: ImageView
     private lateinit var filterPanel: LinearLayout
     private lateinit var spMonth: Spinner
-    private lateinit var spClient: Spinner
+    private lateinit var spSeller: Spinner
     private lateinit var btnApply: Button
 
     private lateinit var rv: androidx.recyclerview.widget.RecyclerView
@@ -35,16 +35,16 @@ class SellerHistoryActivity : AppCompatActivity() {
 
     private var allSales: List<SaleItem> = emptyList()
     private var months: List<String> = emptyList()
-    private var clients: List<FilterClientOption> = emptyList()
+    private var sellers: List<FilterSellerOption> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_seller_history)
+        setContentView(R.layout.activity_client_history)
 
         ivFilter = findViewById(R.id.ivFilter)
         filterPanel = findViewById(R.id.filterPanel)
         spMonth = findViewById(R.id.spMonth)
-        spClient = findViewById(R.id.spClient)
+        spSeller = findViewById(R.id.spSeller)
         btnApply = findViewById(R.id.btnApply)
         rv = findViewById(R.id.rvSales)
         tvEmpty = findViewById(R.id.tvEmpty)
@@ -68,13 +68,13 @@ class SellerHistoryActivity : AppCompatActivity() {
             filterPanel.visibility = View.GONE
         }
 
-        val bottom = findViewById<BottomNavigationView>(R.id.bottomNavSeller)
+        val bottom = findViewById<BottomNavigationView>(R.id.bottomNavClient)
         bottom.selectedItemId = R.id.nav_history
         bottom.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_history -> true
                 R.id.nav_home -> {
-                    startActivity(Intent(this, SellerDashboardActivity::class.java))
+                    startActivity(Intent(this, ClientDashboardActivity::class.java))
                     finish()
                     true
                 }
@@ -97,7 +97,7 @@ class SellerHistoryActivity : AppCompatActivity() {
             onOk = { storeId ->
                 db.collection("stores").document(storeId)
                     .collection("sales")
-                    .whereEqualTo("sellerId", user.uid)
+                    .whereEqualTo("clientId", user.uid)
                     .get()
                     .addOnSuccessListener { snap ->
                         allSales = snap.documents.map { doc ->
@@ -106,8 +106,8 @@ class SellerHistoryActivity : AppCompatActivity() {
                                 saleNumber = doc.getString("saleNumber") ?: "",
                                 amount = doc.getDouble("amount") ?: 0.0,
                                 date = doc.getTimestamp("date") ?: Timestamp.now(),
-                                clientId = doc.getString("clientId") ?: "",
-                                clientName = doc.getString("clientName") ?: ""
+                                clientId = doc.getString("sellerId") ?: "",
+                                clientName = doc.getString("sellerName") ?: ""
                             )
                         }.sortedByDescending { it.date?.toDate()?.time ?: 0L }
 
@@ -115,7 +115,7 @@ class SellerHistoryActivity : AppCompatActivity() {
                         applyFilters()
                     }
                     .addOnFailureListener { e ->
-                        Toast.makeText(this, "Error cargando ventas: ${e.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Error cargando historial: ${e.message}", Toast.LENGTH_LONG).show()
                     }
             },
             onFail = { msg ->
@@ -138,25 +138,25 @@ class SellerHistoryActivity : AppCompatActivity() {
             setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
 
-        clients = allSales
-            .map { FilterClientOption(it.clientId, it.clientName.ifBlank { it.clientId }) }
+        sellers = allSales
+            .map { FilterSellerOption(it.clientId, it.clientName.ifBlank { "Vendedor" }) }
             .distinctBy { it.id }
             .sortedBy { it.name.lowercase() }
 
-        val clientOptions = mutableListOf(FilterClientOption("", "Todos"))
-        clientOptions.addAll(clients)
+        val sellerOptions = mutableListOf(FilterSellerOption("", "Todos"))
+        sellerOptions.addAll(sellers)
 
-        spClient.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, clientOptions).apply {
+        spSeller.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, sellerOptions).apply {
             setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
     }
 
     private fun applyFilters() {
-        val monthSelected = spMonth.selectedItem.toString() // "Todos" o "YYYY-MM"
-        val clientSelected = spClient.selectedItem as FilterClientOption
+        val monthSelected = spMonth.selectedItem?.toString() ?: "Todos"
+        val sellerSelected = spSeller.selectedItem as? FilterSellerOption
 
         val filtered = allSales.filter { sale ->
-            val okClient = clientSelected.id.isEmpty() || sale.clientId == clientSelected.id
+            val okSeller = sellerSelected == null || sellerSelected.id.isEmpty() || sale.clientId == sellerSelected.id
 
             val okMonth = if (monthSelected == "Todos") true else {
                 val d = sale.date?.toDate()
@@ -166,7 +166,7 @@ class SellerHistoryActivity : AppCompatActivity() {
                 }
             }
 
-            okClient && okMonth
+            okSeller && okMonth
         }
 
         adapter.update(filtered)

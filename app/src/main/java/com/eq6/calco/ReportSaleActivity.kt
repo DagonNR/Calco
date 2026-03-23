@@ -51,39 +51,54 @@ class ReportSaleActivity : AppCompatActivity() {
             btnSend.isEnabled = false
             btnSend.text = "Enviando..."
 
-            db.collection("users").document(user.uid).get()
-                .addOnSuccessListener { reporterDoc ->
-                    val reporterName = reporterDoc.getString("name") ?: (user.email ?: "Usuario")
-                    val reporterRole = reporterDoc.getString("role") ?: "unknown"
+            StoreSession.getStoreId(
+                onOk = { storeId ->
 
-                    val reportData = hashMapOf(
-                        "saleId" to saleId,
-                        "saleNumber" to saleNumber,
-                        "reason" to spReason.selectedItem.toString(),
-                        "description" to etDesc.text.toString().trim(),
-                        "status" to "pending",
-                        "createdAt" to Timestamp.now(),
-                        "createdById" to user.uid,
-                        "createdByName" to reporterName,
-                        "createdByRole" to reporterRole
-                    )
+                    db.collection("stores").document(storeId)
+                        .collection("users").document(user.uid)
+                        .get()
+                        .addOnSuccessListener { reporterDoc ->
 
-                    db.collection("reports").add(reportData)
-                        .addOnSuccessListener {
-                            Toast.makeText(this, "Reporte enviado", Toast.LENGTH_LONG).show()
-                            finish()
+                            val reporterName = reporterDoc.getString("name") ?: (user.email ?: "Usuario")
+                            val reporterRole = (reporterDoc.getString("role") ?: "unknown").lowercase().trim()
+
+                            val reportData: MutableMap<String, Any> = mutableMapOf(
+                                "saleId" to saleId,
+                                "saleNumber" to saleNumber,
+                                "reason" to spReason.selectedItem.toString(),
+                                "description" to etDesc.text.toString().trim(),
+                                "status" to "pending",
+                                "createdAt" to Timestamp.now(),
+                                "createdById" to user.uid,
+                                "createdByName" to reporterName,
+                                "createdByRole" to reporterRole
+                            )
+
+                            db.collection("stores").document(storeId)
+                                .collection("reports")
+                                .add(reportData)
+                                .addOnSuccessListener {
+                                    Toast.makeText(this, "Reporte enviado", Toast.LENGTH_LONG).show()
+                                    finish()
+                                }
+                                .addOnFailureListener { e ->
+                                    btnSend.isEnabled = true
+                                    btnSend.text = "Enviar"
+                                    Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                                }
                         }
                         .addOnFailureListener { e ->
                             btnSend.isEnabled = true
                             btnSend.text = "Enviar"
                             Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
                         }
-                }
-                .addOnFailureListener { e ->
+                },
+                onFail = { msg ->
                     btnSend.isEnabled = true
                     btnSend.text = "Enviar"
-                    Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
                 }
+            )
         }
 
         val bottom = findViewById<BottomNavigationView>(R.id.bottomNavSeller)

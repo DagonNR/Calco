@@ -10,18 +10,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Calco">
+        <activity
+            android:name=".ClientDetailActivity"
+            android:exported="false" />
         <activity android:name=".RouterActivity" />
-
         <activity android:name=".AdminDashboardActivity" />
         <activity android:name=".SellerDashboardActivity" />
         <activity android:name=".ClientDashboardActivity" />
-
+        <activity android:name=".ClientHistoryActivity" />
         <activity android:name=".LoginActivity" />
         <activity
             android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -34,7 +37,12 @@
         <activity android:name=".SaleDetailActivity" />
         <activity android:name=".ReportSaleActivity" />
         <activity android:name=".ProfileActivity" />
-
+        <activity android:name=".CreateStoreActivity" />
+        <activity android:name=".ProductsActivity" />
+        <activity android:name=".CreateProductActivity" />
+        <activity android:name=".ProductDetailActivity" />
+        <activity android:name=".InventoryMovementActivity" />
+        <activity android:name=".RegisterSaleCartActivity" />
     </application>
 
 </manifest>
