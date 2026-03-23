@@ -89,12 +89,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Cliente"
+                    android:text="Vendedor"
                     android:textColor="@color/textDark"
                     android:layout_marginTop="12dp"/>
 
                 <Spinner
-                    android:id="@+id/spClient"
+                    android:id="@+id/spSeller"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:layout_marginTop="8dp"
@@ -130,7 +130,7 @@
                 android:id="@+id/tvEmpty"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="No hay ventas"
+                android:text="No tienes compras registradas"
                 android:textColor="#6B7280"
                 android:gravity="center"
                 android:visibility="gone"
@@ -144,11 +144,11 @@
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavSeller"
+        android:id="@+id/bottomNavClient"
         android:layout_width="0dp"
         android:layout_height="80dp"
         android:background="#F3F5F6"
-        app:menu="@menu/menu_seller_bottom"
+        app:menu="@menu/menu_client_bottom"
         app:itemIconTint="@color/bottom_nav_colors"
         app:itemTextColor="#49454F"
         app:itemActiveIndicatorStyle="@style/BottomNavActiveIndicator"
