@@ -17,6 +17,7 @@
         <activity android:name=".AdminDashboardActivity" />
         <activity android:name=".SellerDashboardActivity" />
         <activity android:name=".ClientDashboardActivity" />
+        <activity android:name=".ClientHistoryActivity" />
         <activity android:name=".LoginActivity" />
         <activity
             android:name=".SplashActivity"
