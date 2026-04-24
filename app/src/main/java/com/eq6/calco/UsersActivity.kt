@@ -74,6 +74,8 @@ class UsersActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_report -> {
+                    startActivity(Intent(this, AdminReportActivity::class.java))
+                    finish()
                     true
                 }
                 R.id.nav_products -> {

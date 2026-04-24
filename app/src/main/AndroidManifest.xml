@@ -43,6 +43,7 @@
         <activity android:name=".ProductDetailActivity" />
         <activity android:name=".InventoryMovementActivity" />
         <activity android:name=".RegisterSaleCartActivity" />
+        <activity android:name=".AdminReportActivity" />
     </application>
 
 </manifest>
