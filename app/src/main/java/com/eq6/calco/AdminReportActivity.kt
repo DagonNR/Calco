@@ -1,6 +1,7 @@
 package com.eq6.calco
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -17,6 +19,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.text.NumberFormat
 import java.util.Calendar
 import java.util.Locale
+import com.eq6.calco.pdf.ReportPdfExporter
+import com.eq6.calco.pdf.ReportRepository
 
 data class MonthOption(val monthKey: String, val label: String) {
     override fun toString(): String = label
@@ -43,6 +47,7 @@ class AdminReportActivity : AppCompatActivity() {
     private var baseMonthKey: String = ""
     private var compMonthKey: String = ""
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admin_report)
@@ -57,7 +62,6 @@ class AdminReportActivity : AppCompatActivity() {
 
         progressDonut = findViewById(R.id.progressDonut)
 
-        // CORRECCIÓN: Usar ImageView en lugar de ImageButton para coincidir con el XML
         findViewById<View>(R.id.btnFilter).setOnClickListener { openFilterDialog() }
 
         findViewById<MaterialButton>(R.id.btnSalesList).setOnClickListener {
@@ -65,7 +69,50 @@ class AdminReportActivity : AppCompatActivity() {
         }
 
         findViewById<MaterialButton>(R.id.btnExportPdf).setOnClickListener {
-            Toast.makeText(this, "Pendiente: Exportar a PDF", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Generando PDF...", Toast.LENGTH_SHORT).show()
+
+            val repo = ReportRepository(FirebaseFirestore.getInstance())
+            val exporter = ReportPdfExporter()
+            val trendMonths = buildLastMonths(baseMonthKey, 6)
+
+            fetchStoreName(
+                storeId = storeId,
+                onOk = { storeName ->
+
+                    repo.fetchReportData(
+                        storeId = storeId,
+                        baseMonthKey = baseMonthKey,
+                        compMonthKey = compMonthKey,
+                        trendMonths = trendMonths,
+                        onOk = { totals, trend, top ->
+                            exporter.export(
+                                context = this,
+                                storeName = storeName,
+                                totals = totals,
+                                trend = trend,
+                                top = top,
+                                onOk = { uri ->
+                                    Toast.makeText(this, "PDF guardado en Descargas", Toast.LENGTH_LONG).show()
+
+                                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                                        setDataAndType(uri, "application/pdf")
+                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    }
+                                    startActivity(intent)
+                                },
+                                onFail = { msg ->
+                                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+                                }
+                            )
+                        },
+                        onFail = { msg -> Toast.makeText(this, msg, Toast.LENGTH_LONG).show() }
+                    )
+
+                },
+                onFail = { msg ->
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+                }
+            )
         }
 
         setupBottomNav()
@@ -145,6 +192,48 @@ class AdminReportActivity : AppCompatActivity() {
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error cargando meses: ${e.message}", Toast.LENGTH_LONG).show()
                 refreshReport()
+            }
+    }
+
+    private fun buildLastMonths(baseMonthKey: String, count: Int): List<String> {
+        val parts = baseMonthKey.split("-")
+        val year = parts[0].toInt()
+        val month = parts[1].toInt()
+
+        val cal = java.util.Calendar.getInstance()
+        cal.set(java.util.Calendar.YEAR, year)
+        cal.set(java.util.Calendar.MONTH, month - 1)
+        cal.set(java.util.Calendar.DAY_OF_MONTH, 1)
+
+        val months = mutableListOf<String>()
+        for (i in 0 until count) {
+            val mk = String.format(
+                java.util.Locale.getDefault(),
+                "%04d-%02d",
+                cal.get(java.util.Calendar.YEAR),
+                cal.get(java.util.Calendar.MONTH) + 1
+            )
+            months.add(0, mk) // para que quede del más viejo al más nuevo
+            cal.add(java.util.Calendar.MONTH, -1)
+        }
+        return months
+    }
+
+    private fun fetchStoreName(
+        storeId: String,
+        onOk: (String) -> Unit,
+        onFail: (String) -> Unit
+    ) {
+        FirebaseFirestore.getInstance()
+            .collection("stores")
+            .document(storeId)
+            .get()
+            .addOnSuccessListener { doc ->
+                val name = (doc.getString("name") ?: "").trim()
+                onOk(if (name.isBlank()) "Tienda $storeId" else name)
+            }
+            .addOnFailureListener { e ->
+                onFail(e.message ?: "Error leyendo tienda")
             }
     }
 
