@@ -19,10 +19,9 @@ class AdminDashboardActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.tvHello).text = "Hola,\n$name\n(Admin)"
 
+        // El ícono de la esquina ahora lleva al perfil en lugar de cerrar sesión
         findViewById<ImageView>(R.id.ivProfile).setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
+            startActivity(Intent(this, ProfileActivity::class.java))
         }
 
         val bottom = findViewById<BottomNavigationView>(R.id.bottomNavAdmin)

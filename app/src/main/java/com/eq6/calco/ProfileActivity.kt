@@ -111,15 +111,18 @@ class ProfileActivity : AppCompatActivity() {
 
         bottom.selectedItemId = when (role) {
             "seller", "client" -> R.id.nav_profile
+            "admin" -> R.id.nav_profile // Ajustado para admin también
             else -> R.id.nav_home
         }
 
         bottom.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                // Vendedor/Cliente
                 R.id.nav_history -> {
-                    if (role == "seller") startActivity(Intent(this, SellerHistoryActivity::class.java))
-                    //else startActivity(Intent(this, ClientHistoryActivity::class.java)) QUITAR CUANDO SE IMPLEMENTE EL CLIENTE
+                    if (role == "seller") {
+                        startActivity(Intent(this, SellerHistoryActivity::class.java))
+                    } else if (role == "client") {
+                        startActivity(Intent(this, ClientHistoryActivity::class.java))
+                    }
                     finish()
                     true
                 }
@@ -134,14 +137,19 @@ class ProfileActivity : AppCompatActivity() {
                 }
                 R.id.nav_profile -> true
 
-                // Admin
                 R.id.nav_users -> {
                     startActivity(Intent(this, UsersActivity::class.java))
                     finish()
                     true
                 }
                 R.id.nav_report -> {
-                    // Reportes de admins
+                    startActivity(Intent(this, AdminReportActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_products -> {
+                    startActivity(Intent(this, ProductsActivity::class.java))
+                    finish()
                     true
                 }
                 else -> false

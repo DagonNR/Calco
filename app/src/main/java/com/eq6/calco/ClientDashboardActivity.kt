@@ -17,10 +17,9 @@ class ClientDashboardActivity : AppCompatActivity() {
         val name = intent.getStringExtra("name") ?: "Cliente"
         findViewById<TextView>(R.id.tvHello).text = "Hola,\n$name\n(Cliente)"
 
+        // El ícono de la esquina ahora lleva al perfil en lugar de cerrar sesión directamente
         findViewById<ImageView>(R.id.ivProfile).setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
+            startActivity(Intent(this, ProfileActivity::class.java))
         }
 
         val bottom = findViewById<BottomNavigationView>(R.id.bottomNavClient)
@@ -35,6 +34,8 @@ class ClientDashboardActivity : AppCompatActivity() {
                 }
                 R.id.nav_home -> true
                 R.id.nav_profile -> {
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    finish()
                     true
                 }
                 else -> false
