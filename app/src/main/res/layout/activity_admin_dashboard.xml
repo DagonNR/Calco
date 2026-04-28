@@ -136,15 +136,13 @@
                 android:gravity="center"/>
 
              <com.google.android.material.card.MaterialCardView
+                 android:id="@+id/cardCompareStats"
                  android:layout_width="224dp"
                  android:layout_height="60dp"
-                 android:layout_gravity="right"
+                 android:layout_gravity="center_horizontal"
                  app:cardBackgroundColor="#F0B2B2"
                  app:cardCornerRadius="12dp"
-                 app:cardUseCompatPadding="true"
-                 app:layout_constraintEnd_toEndOf="parent"
-                 app:layout_constraintStart_toStartOf="parent"
-                 app:layout_constraintTop_toTopOf="parent">
+                 app:cardUseCompatPadding="true">
 
                  <TextView
                      android:id="@+id/tvCompareDiff"
@@ -154,12 +152,13 @@
                      android:layout_marginLeft="8dp"
                      android:layout_marginTop="2dp"
                      android:layout_marginRight="5dp"
-                     android:text="-$1,122,999.78"
+                     android:text="-$0.00"
                      android:textColor="#D11A2A"
                      android:textSize="22sp"
                      android:textStyle="bold" />
 
                  <ImageView
+                     android:id="@+id/ivCompareArrow"
                      android:layout_width="40dp"
                      android:layout_height="40dp"
                      android:layout_gravity="right"
@@ -173,7 +172,7 @@
                      android:layout_gravity="left"
                      android:layout_marginTop="30dp"
                      android:layout_marginLeft="8dp"
-                     android:text="-88.8%"
+                     android:text="0.0%"
                      android:textColor="#D11A2A"
                      android:textSize="10sp" />
              </com.google.android.material.card.MaterialCardView>
