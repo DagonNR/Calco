@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-class PurchaseDetailActivity : AppCompatActivity() {
+class ClientDetailActivity : AppCompatActivity() {
 
     private val db by lazy { FirebaseFirestore.getInstance() }
 

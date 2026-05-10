@@ -26,21 +26,28 @@ class RouterActivity : AppCompatActivity() {
 
         db.collection("usersIndex").document(uid).get()
             .addOnSuccessListener { doc ->
-                // Si no existe el doc, mandamos a crear tienda
                 if (!doc.exists()) {
-                    startActivity(Intent(this, CreateStoreActivity::class.java))
-                    finish()
+                    Toast.makeText(this, "Cuenta no registrada en el sistema", Toast.LENGTH_LONG).show()
+                    auth.signOut()
+                    goToLogin()
                     return@addOnSuccessListener
                 }
 
                 val role = (doc.getString("role") ?: "").lowercase().trim()
                 val storeId = (doc.getString("storeId") ?: "").trim()
+                val needsStoreSetup = doc.getBoolean("needsStoreSetup") ?: false
                 val name = doc.getString("name") ?: (user.email ?: "Usuario")
 
-                // Si existe el doc pero no hay storeId, también mandamos a crear tienda
-                if (storeId.isBlank()) {
+                if (role == "admin" && (storeId.isBlank() || needsStoreSetup)) {
                     startActivity(Intent(this, CreateStoreActivity::class.java))
                     finish()
+                    return@addOnSuccessListener
+                }
+
+                if (storeId.isBlank()) {
+                    Toast.makeText(this, "La cuenta no tiene tienda asignada", Toast.LENGTH_LONG).show()
+                    auth.signOut()
+                    goToLogin()
                     return@addOnSuccessListener
                 }
 
@@ -56,7 +63,7 @@ class RouterActivity : AppCompatActivity() {
                 }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error leyendo usersIndex: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Error leyendo cuenta: ${e.message}", Toast.LENGTH_LONG).show()
                 auth.signOut()
                 goToLogin()
             }

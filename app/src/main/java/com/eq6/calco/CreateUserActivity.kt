@@ -146,15 +146,38 @@ class CreateUserActivity : AppCompatActivity() {
                             batch.set(storeUserRef, storeUserData)
                         }.addOnSuccessListener {
 
-                            secondaryAuth.sendPasswordResetEmail(email)
-                                .addOnSuccessListener {
-                                    setLoading(false)
-                                    Toast.makeText(this, "Usuario creado. Se envió correo para crear contraseña.", Toast.LENGTH_LONG).show()
-                                    finish()
+                            result.user?.sendEmailVerification()
+                                ?.addOnSuccessListener {
+                                    secondaryAuth.sendPasswordResetEmail(email)
+                                        .addOnSuccessListener {
+                                            secondaryAuth.signOut()
+                                            setLoading(false)
+                                            Toast.makeText(
+                                                this,
+                                                "Usuario creado. Se enviaron correos para verificar email y crear contraseña.",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                            finish()
+                                        }
+                                        .addOnFailureListener { e ->
+                                            secondaryAuth.signOut()
+                                            setLoading(false)
+                                            Toast.makeText(
+                                                this,
+                                                "Usuario creado, pero error enviando correo de contraseña: ${e.message}",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                            finish()
+                                        }
                                 }
-                                .addOnFailureListener { e ->
+                                ?.addOnFailureListener { e ->
+                                    secondaryAuth.signOut()
                                     setLoading(false)
-                                    Toast.makeText(this, "Usuario creado, pero error enviando correo: ${e.message}", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(
+                                        this,
+                                        "Usuario creado, pero error enviando verificación: ${e.message}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                     finish()
                                 }
                         }.addOnFailureListener { e ->

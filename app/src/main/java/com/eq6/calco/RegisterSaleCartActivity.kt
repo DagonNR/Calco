@@ -156,6 +156,22 @@ class RegisterSaleCartActivity : AppCompatActivity() {
         updateTotal()
     }
 
+    private fun calculateCommissionRateByAmount(total: Double, baseRate: Double): Double {
+        return when {
+            total >= 1000.0 -> baseRate + 0.02
+            total >= 500.0 -> baseRate + 0.01
+            else -> baseRate
+        }
+    }
+
+    private fun getCommissionRule(total: Double): String {
+        return when {
+            total >= 1000.0 -> "Monto >= 1000: comisión base + 2%"
+            total >= 500.0 -> "Monto >= 500: comisión base + 1%"
+            else -> "Monto < 500: comisión base"
+        }
+    }
+
     private fun updateTotal() {
         val total = cart.sumOf { it.subtotal() }
         tvTotal.text = "Total: ${moneyFmt.format(total)}"
@@ -204,8 +220,10 @@ class RegisterSaleCartActivity : AppCompatActivity() {
 
                     val sSnap = tx.get(sellerRef)
                     val sellerName = sSnap.getString("name") ?: (user.email ?: "Vendedor")
-                    val rate = sSnap.getDouble("commissionRate") ?: 0.03
-                    val commissionAmount = total * rate
+                    val baseRate = sSnap.getDouble("commissionRate") ?: 0.03
+                    val finalRate = calculateCommissionRateByAmount(total, baseRate)
+                    val commissionAmount = total * finalRate
+                    val commissionRule = getCommissionRule(total)
 
                     val productRefs = cart.map { item ->
                         item.productId to storeRef.collection("products").document(item.productId)
@@ -237,8 +255,10 @@ class RegisterSaleCartActivity : AppCompatActivity() {
                         "total" to total,
                         "date" to saleDate,
                         "monthKey" to monthKey,
-                        "commissionRateUsed" to rate,
+                        "commissionBaseRate" to baseRate,
+                        "commissionRateUsed" to finalRate,
                         "commissionAmount" to commissionAmount,
+                        "commissionRule" to commissionRule,
                         "createdAt" to Timestamp.now()
                     )
                     tx.set(saleRef, saleData)

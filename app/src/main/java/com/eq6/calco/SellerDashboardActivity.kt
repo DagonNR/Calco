@@ -121,9 +121,10 @@ class SellerDashboardActivity : AppCompatActivity() {
                                 val total = salesDocs.sumOf { it.getDouble("amount") ?: 0.0 }
                                 tvTotalAmount.text = moneyFmt.format(total)
 
-                                val commission = total * rate
+                                val commission = salesDocs.sumOf { it.getDouble("commissionAmount") ?: 0.0 }
+
                                 tvCommissionAmount.text = moneyFmt.format(commission)
-                                tvCommissionNote.text = "${(rate * 100).toInt()}% de ${moneyFmt.format(total)}"
+                                tvCommissionNote.text = "Según % base y monto de venta"
 
                                 // últimas 3 ventas (o cambia a 4 si quieres)
                                 val last3 = salesDocs

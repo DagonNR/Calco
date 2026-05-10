@@ -33,6 +33,11 @@ class LoginActivity : AppCompatActivity() {
 
         btnLogin.setOnClickListener { doLogin() }
         tvForgot.setOnClickListener { showResetPasswordDialog() }
+
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.btnCreateStoreAccount)
+            .setOnClickListener {
+                startActivity(Intent(this, RegisterStoreAdminActivity::class.java))
+            }
     }
 
     private fun doLogin() {
@@ -56,12 +61,46 @@ class LoginActivity : AppCompatActivity() {
 
         auth.signInWithEmailAndPassword(email, pass)
             .addOnSuccessListener {
-                startActivity(Intent(this, RouterActivity::class.java))
-                finish()
-            }
-            .addOnFailureListener { e ->
-                setLoading(false)
-                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                val user = auth.currentUser
+
+                user?.reload()?.addOnSuccessListener {
+                    val refreshedUser = auth.currentUser
+
+                    if (refreshedUser?.isEmailVerified == true) {
+                        startActivity(Intent(this, RouterActivity::class.java))
+                        finish()
+                    } else {
+                        androidx.appcompat.app.AlertDialog.Builder(this)
+                            .setTitle("Correo no verificado")
+                            .setMessage("Primero debes verificar tu correo electrónico. ¿Quieres que reenviemos el correo de verificación?")
+                            .setPositiveButton("Reenviar") { _, _ ->
+                                refreshedUser?.sendEmailVerification()
+                                    ?.addOnSuccessListener {
+                                        auth.signOut()
+                                        Toast.makeText(
+                                            this,
+                                            "Correo de verificación reenviado. Revisa tu bandeja de entrada o spam.",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                    ?.addOnFailureListener { e ->
+                                        auth.signOut()
+                                        Toast.makeText(
+                                            this,
+                                            "Error reenviando verificación: ${e.message}",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                            }
+                            .setNegativeButton("Cancelar") { _, _ ->
+                                auth.signOut()
+                            }
+                            .show()
+                    }
+                }?.addOnFailureListener { e ->
+                    auth.signOut()
+                    Toast.makeText(this, "Error verificando correo: ${e.message}", Toast.LENGTH_LONG).show()
+                }
             }
     }
 

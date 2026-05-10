@@ -23,9 +23,10 @@ class CreateStoreActivity : AppCompatActivity() {
         val btn = findViewById<Button>(R.id.btnCreateStore)
 
         btn.setOnClickListener {
-            val name = etStoreName.text.toString().trim()
-            if (name.isEmpty()) {
-                etStoreName.error = "Ingresa el nombre"
+            val storeName = etStoreName.text.toString().trim()
+
+            if (storeName.isEmpty()) {
+                etStoreName.error = "Ingresa el nombre de la tienda"
                 return@setOnClickListener
             }
 
@@ -39,50 +40,87 @@ class CreateStoreActivity : AppCompatActivity() {
             btn.isEnabled = false
             btn.text = "Creando..."
 
-            val storeRef = db.collection("stores").document()
-            val storeId = storeRef.id
+            val indexRef = db.collection("usersIndex").document(user.uid)
 
-            val storeData: MutableMap<String, Any> = mutableMapOf(
-                "name" to name,
-                "createdAt" to Timestamp.now(),
-                "ownerId" to user.uid
-            )
+            indexRef.get()
+                .addOnSuccessListener { indexDoc ->
+                    if (!indexDoc.exists()) {
+                        btn.isEnabled = true
+                        btn.text = "Crear"
+                        Toast.makeText(this, "Cuenta no registrada", Toast.LENGTH_LONG).show()
+                        auth.signOut()
+                        startActivity(Intent(this, LoginActivity::class.java))
+                        finish()
+                        return@addOnSuccessListener
+                    }
 
-            db.runBatch { batch ->
-                batch.set(storeRef, storeData)
+                    val role = (indexDoc.getString("role") ?: "").lowercase().trim()
+                    if (role != "admin") {
+                        btn.isEnabled = true
+                        btn.text = "Crear"
+                        Toast.makeText(this, "Solo un admin puede crear tienda", Toast.LENGTH_LONG).show()
+                        return@addOnSuccessListener
+                    }
 
-                val indexRef = db.collection("usersIndex").document(user.uid)
-                val indexData: MutableMap<String, Any> = mutableMapOf(
-                    "storeId" to storeId,
-                    "role" to "admin",
-                    "name" to (user.displayName ?: "Admin"),
-                    "email" to (user.email ?: "")
-                )
-                batch.set(indexRef, indexData)
+                    val adminName = indexDoc.getString("name") ?: (user.email ?: "Admin")
+                    val adminEmail = indexDoc.getString("email") ?: (user.email ?: "")
 
-                val storeUserRef = db.collection("stores").document(storeId)
-                    .collection("users").document(user.uid)
+                    val storeRef = db.collection("stores").document()
+                    val storeId = storeRef.id
 
-                val storeUserData: MutableMap<String, Any> = mutableMapOf(
-                    "name" to (user.displayName ?: "Admin"),
-                    "email" to (user.email ?: ""),
-                    "role" to "admin",
-                    "createdAt" to Timestamp.now()
-                )
-                batch.set(storeUserRef, storeUserData)
+                    val storeData: MutableMap<String, Any> = mutableMapOf(
+                        "name" to storeName,
+                        "createdAt" to Timestamp.now(),
+                        "ownerId" to user.uid
+                    )
 
-                val counterRef = db.collection("stores").document(storeId)
-                    .collection("counters").document("sales")
-                batch.set(counterRef, mapOf("lastNumber" to 0L))
-            }.addOnSuccessListener {
-                Toast.makeText(this, "Tienda creada", Toast.LENGTH_LONG).show()
-                startActivity(Intent(this, RouterActivity::class.java))
-                finish()
-            }.addOnFailureListener { e ->
-                btn.isEnabled = true
-                btn.text = "Crear"
-                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
-            }
+                    val indexUpdate: MutableMap<String, Any> = mutableMapOf(
+                        "storeId" to storeId,
+                        "needsStoreSetup" to false
+                    )
+
+                    db.runBatch { batch ->
+                        batch.set(storeRef, storeData)
+                        batch.update(indexRef, indexUpdate)
+                    }.addOnSuccessListener {
+
+                        val storeUserRef = db.collection("stores").document(storeId)
+                            .collection("users").document(user.uid)
+
+                        val counterRef = db.collection("stores").document(storeId)
+                            .collection("counters").document("sales")
+
+                        val storeUserData: MutableMap<String, Any> = mutableMapOf(
+                            "name" to adminName,
+                            "email" to adminEmail,
+                            "role" to "admin",
+                            "createdAt" to Timestamp.now()
+                        )
+
+                        db.runBatch { batch ->
+                            batch.set(storeUserRef, storeUserData)
+                            batch.set(counterRef, mapOf("lastNumber" to 0L))
+                        }.addOnSuccessListener {
+                            Toast.makeText(this, "Tienda creada", Toast.LENGTH_LONG).show()
+                            startActivity(Intent(this, RouterActivity::class.java))
+                            finish()
+                        }.addOnFailureListener { e ->
+                            btn.isEnabled = true
+                            btn.text = "Crear"
+                            Toast.makeText(this, "Error creando datos de tienda: ${e.message}", Toast.LENGTH_LONG).show()
+                        }
+
+                    }.addOnFailureListener { e ->
+                        btn.isEnabled = true
+                        btn.text = "Crear"
+                        Toast.makeText(this, "Error creando tienda: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+                .addOnFailureListener { e ->
+                    btn.isEnabled = true
+                    btn.text = "Crear"
+                    Toast.makeText(this, "Error leyendo cuenta: ${e.message}", Toast.LENGTH_LONG).show()
+                }
         }
     }
 }
