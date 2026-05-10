@@ -65,7 +65,9 @@ class AdminReportActivity : AppCompatActivity() {
         findViewById<View>(R.id.btnFilter).setOnClickListener { openFilterDialog() }
 
         findViewById<MaterialButton>(R.id.btnSalesList).setOnClickListener {
-            Toast.makeText(this, "Pendiente: Lista de ventas", Toast.LENGTH_SHORT).show()
+            val i = Intent(this, AdminSalesActivity::class.java)
+            i.putExtra("monthKey", baseMonthKey)
+            startActivity(i)
         }
 
         findViewById<MaterialButton>(R.id.btnExportPdf).setOnClickListener {

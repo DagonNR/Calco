@@ -45,6 +45,7 @@
         <activity android:name=".RegisterSaleCartActivity" />
         <activity android:name=".AdminReportActivity" />
         <activity android:name=".RegisterStoreAdminActivity" />
+        <activity android:name=".AdminSalesActivity" />
     </application>
 
 </manifest>
