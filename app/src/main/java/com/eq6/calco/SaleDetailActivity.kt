@@ -104,27 +104,5 @@ class SaleDetailActivity : AppCompatActivity() {
             i.putExtra("saleNumber", saleNumber)
             startActivity(i)
         }
-
-        val bottom = findViewById<BottomNavigationView>(R.id.bottomNavSeller)
-        bottom.selectedItemId = R.id.nav_history
-        bottom.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_history -> {
-                    finish()
-                    true
-                }
-                R.id.nav_home -> {
-                    startActivity(Intent(this, SellerDashboardActivity::class.java))
-                    finish()
-                    true
-                }
-                R.id.nav_profile -> {
-                    startActivity(Intent(this, ProfileActivity::class.java))
-                    finish()
-                    true
-                }
-                else -> false
-            }
-        }
     }
 }

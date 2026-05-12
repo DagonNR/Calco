@@ -100,24 +100,5 @@ class ReportSaleActivity : AppCompatActivity() {
                 }
             )
         }
-
-        val bottom = findViewById<BottomNavigationView>(R.id.bottomNavSeller)
-        bottom.selectedItemId = R.id.nav_history
-        bottom.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_history -> {
-                    startActivity(Intent(this, SellerHistoryActivity::class.java))
-                    finish()
-                    true
-                }
-                R.id.nav_home -> true
-                R.id.nav_profile -> {
-                    startActivity(Intent(this, ProfileActivity::class.java))
-                    finish()
-                    true
-                }
-                else -> false
-            }
-        }
     }
 }
