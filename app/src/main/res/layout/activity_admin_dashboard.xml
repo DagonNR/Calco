@@ -148,28 +148,18 @@
                      android:id="@+id/tvCompareDiff"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
-                     android:layout_gravity="left"
-                     android:layout_marginLeft="8dp"
+                     android:layout_gravity="center_horizontal"
                      android:layout_marginTop="2dp"
-                     android:layout_marginRight="5dp"
                      android:text="-$0.00"
                      android:textColor="#D11A2A"
                      android:textSize="22sp"
                      android:textStyle="bold" />
 
-                 <ImageView
-                     android:id="@+id/ivCompareArrow"
-                     android:layout_width="40dp"
-                     android:layout_height="40dp"
-                     android:layout_gravity="right"
-                     android:layout_marginTop="4dp"
-                     android:src="@drawable/arrow_down" />
-
                  <TextView
                      android:id="@+id/tvComparePct"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
-                     android:layout_gravity="left"
+                     android:layout_gravity="center_horizontal"
                      android:layout_marginTop="30dp"
                      android:layout_marginLeft="8dp"
                      android:text="0.0%"

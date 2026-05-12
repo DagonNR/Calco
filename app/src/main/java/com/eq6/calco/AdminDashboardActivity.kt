@@ -80,7 +80,6 @@ class AdminDashboardActivity : AppCompatActivity() {
     private lateinit var tvMonth: TextView
     private lateinit var tvCompareDiff: TextView
     private lateinit var tvComparePct: TextView
-    private lateinit var ivCompareArrow: ImageView
     private lateinit var cardCompareStats: MaterialCardView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,7 +90,6 @@ class AdminDashboardActivity : AppCompatActivity() {
         tvMonth = findViewById(R.id.tvMonth)
         tvCompareDiff = findViewById(R.id.tvCompareDiff)
         tvComparePct = findViewById(R.id.tvComparePct)
-        ivCompareArrow = findViewById(R.id.ivCompareArrow)
         cardCompareStats = findViewById(R.id.cardCompareStats)
 
         val name = intent.getStringExtra("name") ?: "Admin"
@@ -197,14 +195,10 @@ class AdminDashboardActivity : AppCompatActivity() {
             cardCompareStats.setCardBackgroundColor(android.graphics.Color.parseColor("#DCFCE7"))
             tvCompareDiff.setTextColor(android.graphics.Color.parseColor("#166534"))
             tvComparePct.setTextColor(android.graphics.Color.parseColor("#166534"))
-            ivCompareArrow.setImageResource(R.drawable.arrow_down)
-            ivCompareArrow.rotation = 180f
         } else {
             cardCompareStats.setCardBackgroundColor(android.graphics.Color.parseColor("#FEE2E2"))
             tvCompareDiff.setTextColor(android.graphics.Color.parseColor("#B91C1C"))
             tvComparePct.setTextColor(android.graphics.Color.parseColor("#B91C1C"))
-            ivCompareArrow.setImageResource(R.drawable.arrow_down)
-            ivCompareArrow.rotation = 0f
         }
     }
 
