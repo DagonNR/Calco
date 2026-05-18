@@ -92,7 +92,7 @@ class AdminDashboardActivity : AppCompatActivity() {
         tvComparePct = findViewById(R.id.tvComparePct)
         cardCompareStats = findViewById(R.id.cardCompareStats)
 
-        val name = intent.getStringExtra("name") ?: "Admin"
+        val name = getAdminDisplayName()
         findViewById<TextView>(R.id.tvHello).text = "Hola,\n$name\n(Admin)"
 
         findViewById<ImageView>(R.id.ivProfile).setOnClickListener {
@@ -142,6 +142,27 @@ class AdminDashboardActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.fabAdmin).setOnClickListener {
             startActivity(Intent(this, CreateUserActivity::class.java))
         }
+    }
+
+    private fun getAdminDisplayName(): String {
+        val prefs = getSharedPreferences("user_session", MODE_PRIVATE)
+
+        val intentName = intent.getStringExtra("name")
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+
+        if (intentName != null) {
+            prefs.edit()
+                .putString("display_name", intentName)
+                .apply()
+
+            return intentName
+        }
+
+        return prefs.getString("display_name", null)
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?: "Admin"
     }
 
     private fun setupDefaultMonths() {
